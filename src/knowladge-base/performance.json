@@ -1,0 +1,382 @@
+[
+  {
+    "id": "R021",
+    "category": "Performance",
+    "symptom": "Overall network speed is significantly slow during peak hours",
+    "conditions": [
+      "`iperf` tests show bandwidth significantly below expected levels",
+      "Router/switch CPU utilization is consistently high (e.g., > 80%)",
+      "Interface statistics (`show interface` on Cisco, `ip -s link show` on Linux) show high utilization or output drops"
+    ],
+    "diagnosis": "Network congestion, insufficient bandwidth, or overburdened network devices",
+    "solution": [
+      "Identify bandwidth-intensive applications or users using NetFlow/sFlow or `iftop`/`nethogs`",
+      "Upgrade core network devices (router, switches) to higher capacity models if CPU/memory is the bottleneck",
+      "Implement QoS (Quality of Service) policies to prioritize critical traffic and de-prioritize less important traffic",
+      "Consider increasing the internet uplink bandwidth from the ISP",
+      "Segment the network into smaller broadcast domains or introduce faster backbone links",
+      "Review network topology for any bottlenecks or single points of failure"
+    ]
+  },
+  {
+    "id": "R022",
+    "category": "Performance",
+    "symptom": "High latency and packet loss observed during ping tests to internal servers",
+    "conditions": [
+      "Continuous ping tests show inconsistent RTT (Round Trip Time) and frequent timeouts",
+      "`traceroute` to affected servers shows increased latency at a specific hop or multiple hops",
+      "Error counters on switch interfaces (e.g., FCS errors, collisions, discards) are incrementing rapidly"
+    ],
+    "diagnosis": "Faulty cable, duplex mismatch, congested switch port, or faulty network adapter",
+    "solution": [
+      "Inspect and replace suspicious Ethernet cables or patch panel connections",
+      "Verify duplex settings on both ends of the link (workstation NIC and switch port) are set to 'auto' or 'full-duplex'",
+      "Move the connection to a different port on the network switch to rule out a faulty port",
+      "Update or reinstall network adapter drivers on the server or workstation",
+      "Check for excessive broadcast storms or network loops (use `spanning-tree show` on switches)",
+      "Analyze switch logs for port error messages or unusual activity"
+    ]
+  },
+  {
+    "id": "R023",
+    "category": "Performance",
+    "symptom": "Specific application performs poorly over the network, while others are fine",
+    "conditions": [
+      "Network monitor tools show the application's traffic experiencing retransmissions or dropped packets",
+      "Application logs report network-related errors or timeouts",
+      "Server hosting the application shows high I/O wait or CPU utilization during application usage"
+    ],
+    "diagnosis": "Application-specific network tuning issues, server-side bottleneck, or misconfigured QoS",
+    "solution": [
+      "Review the application's network requirements and recommended configurations (e.g., TCP window size, MTU)",
+      "Optimize the application server's resources (CPU, RAM, disk I/O) if it's the bottleneck",
+      "Ensure QoS policies are not inadvertently de-prioritizing the application's traffic",
+      "Perform `netstat -s` on the server to check for TCP segment retransmissions or errors",
+      "Consult the application vendor's documentation for network performance best practices",
+      "Isolate the issue using `iperf` or `nuttcp` to measure raw TCP/UDP throughput to the application server"
+    ]
+  },
+  {
+    "id": "R024",
+    "category": "Performance",
+    "symptom": "Wireless clients experience very slow speeds despite good signal strength",
+    "conditions": [
+      "Speed tests on wireless clients show low throughput (e.g., using Fast.com or Ookla Speedtest)",
+      "Wireless network reports high channel utilization or many co-channel/adjacent-channel interference",
+      "Many older wireless devices (802.11b/g) are connected to the same access point as newer ones"
+    ],
+    "diagnosis": "Wireless interference, outdated Wi-Fi standards, or overloaded access point",
+    "solution": [
+      "Use a Wi-Fi analyzer tool to identify channel interference and select a less congested channel for the access point",
+      "Separate 2.4 GHz and 5 GHz networks and encourage clients to use 5 GHz where possible",
+      "Disable legacy 802.11b/g rates on the access point if not needed, as they slow down the entire network",
+      "Consider adding more access points to distribute client load and improve coverage",
+      "Update access point firmware to the latest version for performance improvements",
+      "Ensure that the access point is configured for the highest possible 802.11 standard it supports (e.g., 802.11ac/ax)"
+    ]
+  },
+  {
+    "id": "R025",
+    "category": "Performance",
+    "symptom": "Upload speeds are significantly slower than download speeds (asymmetrical performance)",
+    "conditions": [
+      "Speed tests consistently show a large disparity between upload and download rates",
+      "ISP modem diagnostics show high noise levels or errors on the upstream channel",
+      "QoS policies on the router are configured to prioritize downloads over uploads excessively"
+    ],
+    "diagnosis": "ISP's asymmetrical service, upstream noise, or QoS misconfiguration",
+    "solution": [
+      "Verify the ISP's contracted upload and download speeds to ensure the observed speeds match expectations",
+      "Check ISP modem diagnostics for upstream signal strength, SNR (Signal-to-Noise Ratio), and corrected/uncorrected errors",
+      "Review and adjust QoS configurations on the router to ensure fair bandwidth allocation for uploads",
+      "Ensure no applications or services on the network are saturating the upload bandwidth (e.g., cloud backups, file sharing)",
+      "Bypass the router and test directly with the ISP modem to rule out the router as the bottleneck",
+      "Contact the ISP to report potential line quality issues affecting upload performance"
+    ]
+  },
+  {
+    "id": "R026",
+    "category": "Performance",
+    "symptom": "Video conferencing quality is poor (pixelation, audio drops)",
+    "conditions": [
+      "Video conferencing application reports high jitter, packet loss, or network latency",
+      "During calls, `ping` tests to the video conference server show high latency spikes",
+      "Firewall or router logs show dropped packets related to UDP ports used by video conferencing"
+    ],
+    "diagnosis": "Insufficient bandwidth, lack of QoS, or firewall blocking/inspecting UDP traffic",
+    "solution": [
+      "Ensure sufficient bandwidth is available for video conferencing calls (check application requirements)",
+      "Implement QoS policies on the network to prioritize voice and video traffic (DSCP markings, bandwidth reservation)",
+      "Verify that firewalls are not inspecting or blocking UDP traffic for common video conferencing ports",
+      "Check for network congestion on critical links during video calls using network monitoring tools",
+      "Reduce the number of concurrent bandwidth-heavy activities during calls if bandwidth is limited",
+      "Use a wired connection instead of wireless if possible, as wireless can introduce more jitter and packet loss"
+    ]
+  },
+  {
+    "id": "R027",
+    "category": "Performance",
+    "symptom": "Backup operations to a network-attached storage (NAS) are extremely slow",
+    "conditions": [
+      "File transfer speeds to the NAS are much lower than expected (e.g., using `scp` or file explorer)",
+      "NAS resource utilization (CPU, disk I/O, network interface) is high during backups",
+      "Network interface statistics on the NAS or switch show excessive retransmissions or errors"
+    ],
+    "diagnosis": "NAS performance bottleneck, network congestion to NAS, or faulty cabling/NIC",
+    "solution": [
+      "Check the NAS's hardware resources (CPU, RAM, disk health) for bottlenecks or issues",
+      "Ensure the NAS network interface is operating at its maximum supported speed and duplex (e.g., Gigabit Full Duplex)",
+      "Verify the cable connecting the NAS to the switch is adequate (e.g., Cat5e/Cat6 for Gigabit)",
+      "Check the switch port connected to the NAS for errors, discards, or excessive utilization",
+      "Consider bonding multiple NICs on the NAS for increased throughput (Link Aggregation)",
+      "Review backup software configuration for optimization settings (e.g., block size, compression)"
+    ]
+  },
+  {
+    "id": "R028",
+    "category": "Performance",
+    "symptom": "Remote office users complain about slow access to central servers",
+    "conditions": [
+      "Ping and `traceroute` tests from the remote office to central servers show high latency and sometimes packet loss",
+      "WAN link utilization at the remote office or central site router is consistently high (e.g., > 90%)",
+      "Firewall throughput logs show high CPU utilization or packet inspection delays"
+    ],
+    "diagnosis": "WAN link saturation, router/firewall bottleneck, or routing inefficiencies",
+    "solution": [
+      "Monitor WAN link utilization on both ends to confirm bandwidth saturation is the cause",
+      "Upgrade the WAN link bandwidth if consistently saturated during business hours",
+      "Ensure WAN optimization or SD-WAN solutions are correctly configured and performing as expected",
+      "Check router/firewall CPU and memory utilization at peak times; upgrade hardware if needed",
+      "Review routing configurations to ensure optimal paths are being used for remote office traffic",
+      "Implement QoS on the WAN links to prioritize critical business applications over less critical traffic"
+    ]
+  },
+  {
+    "id": "R029",
+    "category": "Performance",
+    "symptom": "Web Browse is intermittently slow on multiple workstations",
+    "conditions": [
+      "Browser response times are inconsistent, with pages sometimes loading quickly and sometimes very slowly",
+      "DNS resolution appears to be fast, but subsequent page loading is slow",
+      "Network monitoring tools show high TCP retransmission rates on client connections to external websites"
+    ],
+    "diagnosis": "Internet uplink congestion, transparent proxy/firewall inspection, or ISP peering issues",
+    "solution": [
+      "Run speed tests (e.g., Speedtest.net) to verify current internet bandwidth",
+      "Check the internet router's CPU and memory utilization, especially during periods of slow Browse",
+      "If a transparent proxy or content filter is in place, check its resource utilization and logs for bottlenecks",
+      "Bypass the router and connect a workstation directly to the ISP modem to rule out internal network issues",
+      "Contact your ISP to inquire about any network congestion or peering issues on their side",
+      "Consider implementing web caching or local DNS caching to improve Browse experience"
+    ]
+  },
+  {
+    "id": "R030",
+    "category": "Performance",
+    "symptom": "Database queries from client machines are very slow",
+    "conditions": [
+      "Database server logs indicate slow query execution times from the network perspective",
+      "Network latency from clients to the database server is consistently high (e.g., > 10ms)",
+      "Database server shows high disk I/O or CPU usage during query execution"
+    ],
+    "diagnosis": "Database performance issues, network latency, or inefficient database queries",
+    "solution": [
+      "Optimize database queries by adding indexes, rewriting inefficient queries, or denormalizing data",
+      "Ensure the database server has sufficient resources (CPU, RAM, fast storage like SSDs)",
+      "Minimize network latency between the database clients and server (e.g., co-locate them in the same data center)",
+      "Check for network congestion or errors on the path to the database server",
+      "Implement connection pooling on the client side to reduce connection setup overhead",
+      "Review database server network configuration (e.g., TCP buffer sizes)"
+    ]
+  },
+  {
+    "id": "R031",
+    "category": "Performance",
+    "symptom": "Intermittent throughput issues for specific file transfers over SMB/NFS",
+    "conditions": [
+      "File copy operations pause or resume unexpectedly, with fluctuating transfer rates",
+      "Network interface statistics show bursts of activity followed by periods of inactivity",
+      "Server or client logs show I/O errors or network disconnect messages during transfers"
+    ],
+    "diagnosis": "Faulty network cable/NIC, driver issues, or server-side storage performance bottlenecks",
+    "solution": [
+      "Replace the Ethernet cable connecting the affected client/server to the switch",
+      "Update or reinstall network adapter drivers on both the client and the file server",
+      "Check the health and performance of the storage array on the file server (RAID status, disk I/O latency)",
+      "Ensure the network interface on the file server is operating at its full capacity and duplex",
+      "Temporarily disable antivirus or security software on client/server to rule out interference",
+      "Verify sufficient RAM on the file server for caching and buffering large file transfers"
+    ]
+  },
+  {
+    "id": "R032",
+    "category": "Performance",
+    "symptom": "Packet loss observed on a specific WAN link during high traffic",
+    "conditions": [
+      "Ping tests across the WAN link show consistently high packet loss (> 5%) during certain periods",
+      "Router interface statistics for the WAN link show input/output drops or errors",
+      "Bandwidth utilization on the WAN link approaches its maximum capacity"
+    ],
+    "diagnosis": "WAN link congestion, faulty router interface, or incorrect QoS settings causing drops",
+    "solution": [
+      "Monitor the WAN link utilization using SNMP or NetFlow to confirm congestion",
+      "Implement or adjust QoS policies to prioritize critical traffic and manage congestion effectively",
+      "Check for any duplex mismatches on the WAN interface or connected equipment (e.g., ISP CPE)",
+      "Review router CPU and memory utilization; high usage can lead to packet drops",
+      "If persistent, contact the ISP to report potential link quality issues or consider upgrading bandwidth",
+      "Perform an extended ping test with larger packet sizes to stress the link and observe patterns"
+    ]
+  },
+  {
+    "id": "R033",
+    "category": "Performance",
+    "symptom": "Virtual machine network performance is poor on a hypervisor host",
+    "conditions": [
+      "VMs on a specific host show slower network throughput compared to VMs on other hosts",
+      "Hypervisor host's network adapter utilization is high or reports errors",
+      "Guests' CPU or memory utilization is low, indicating network is the bottleneck"
+    ],
+    "diagnosis": "Hypervisor network configuration, physical NIC bottleneck, or driver issues on host",
+    "solution": [
+      "Verify the hypervisor's virtual switch configuration (e.g., VMWare vSwitch, Hyper-V Virtual Switch) for correct settings",
+      "Ensure the physical NICs on the hypervisor host are adequate (e.g., 10GbE) and properly configured (e.g., Jumbo Frames if used)",
+      "Update hypervisor network adapter drivers and firmware to the latest versions",
+      "Check for resource contention on the hypervisor host (e.g., CPU, RAM for network processing)",
+      "Consider using dedicated physical NICs for different types of VM traffic (e.g., vMotion, iSCSI, VM Network)",
+      "Verify VM network adapter types (e.g., VMXNET3 for VMWare, Synthetic for Hyper-V) for optimal performance"
+    ]
+  },
+  {
+    "id": "R034",
+    "category": "Performance",
+    "symptom": "IP Camera streams are laggy and frequently disconnect",
+    "conditions": [
+      "Video surveillance software shows dropped frames or 'connection lost' messages for specific cameras",
+      "Ping to the camera IP addresses shows high latency or timeouts",
+      "Network switches connected to the cameras show high utilization or errors on those specific ports"
+    ],
+    "diagnosis": "Network congestion, insufficient bandwidth for streaming, or faulty camera/cabling",
+    "solution": [
+      "Verify that sufficient network bandwidth is available from the camera to the NVR/monitoring station",
+      "Check for network congestion on switches or routers in the camera's path (e.g., broadcast storms)",
+      "Ensure Power over Ethernet (PoE) switch ports are providing adequate power for the cameras",
+      "Inspect the network cable connecting the camera for damage or loose connections",
+      "Reduce the resolution, frame rate, or bitrate of the camera streams if bandwidth is limited",
+      "Consider using dedicated VLANs for IP camera traffic to isolate it from other network traffic"
+    ]
+  },
+  {
+    "id": "R035",
+    "category": "Performance",
+    "symptom": "Slow performance of external cloud services or SaaS applications",
+    "conditions": [
+      "Internal applications perform well, but access to cloud services is consistently slow",
+      "`traceroute` to the cloud service endpoint shows high latency at hops outside your internal network (e.g., ISP or peering points)",
+      "Internet router CPU/memory is low, indicating the bottleneck is not internal"
+    ],
+    "diagnosis": "ISP congestion, peering issues, or cloud provider regional issues",
+    "solution": [
+      "Contact your ISP to report observations of slow connectivity to specific external endpoints",
+      "Check cloud provider status pages or forums for reported regional issues or outages",
+      "Consider using a different DNS resolver (e.g., 8.8.8.8, 1.1.1.1) to ensure optimal routing to cloud services",
+      "If using direct cloud connect (e.g., AWS Direct Connect, Azure ExpressRoute), verify its status and utilization",
+      "Implement SD-WAN solutions to intelligently route cloud traffic over optimal paths",
+      "Perform `mtr` (My Traceroute) to the cloud service IP to get continuous latency and packet loss data"
+    ]
+  },
+  {
+    "id": "R036",
+    "category": "Performance",
+    "symptom": "Network-attached scanner takes a long time to transfer scanned documents",
+    "conditions": [
+      "Scanning process completes slowly, especially for large documents or multiple pages",
+      "Network monitor shows low throughput during the transfer from the scanner to the destination",
+      "Destination storage (e.g., network share) shows high disk I/O when documents arrive"
+    ],
+    "diagnosis": "Scanner network interface limitation, network congestion, or destination storage bottleneck",
+    "solution": [
+      "Verify the scanner's network interface speed (e.g., 100Mbps vs. Gigabit) and ensure it's operating at its maximum",
+      "Check the network cable connecting the scanner to the switch",
+      "Ensure the destination server/NAS has sufficient disk I/O performance to handle incoming scans",
+      "Reduce the resolution or file size of scanned documents if possible to decrease network load",
+      "Check for network congestion between the scanner and its destination",
+      "Update scanner firmware or network drivers for potential performance improvements"
+    ]
+  },
+  {
+    "id": "R037",
+    "category": "Performance",
+    "symptom": "Remote access gateway (e.g., Citrix, Terminal Services) experiences slow logon times",
+    "conditions": [
+      "Users report significant delays during the logon process to published applications or desktops",
+      "Network latency from clients to the gateway is acceptable, but latency from gateway to backend servers is high",
+      "Gateway server's CPU or memory utilization is high during logon storms"
+    ],
+    "diagnosis": "Backend server performance, network congestion to backend, or gateway resource exhaustion",
+    "solution": [
+      "Monitor backend servers (domain controllers, database servers, application servers) for performance bottlenecks (CPU, RAM, disk I/O)",
+      "Check network latency and throughput between the gateway and backend servers",
+      "Ensure the gateway server has sufficient CPU, RAM, and fast storage for its role",
+      "Review gateway logs for errors related to authentication, profile loading, or session establishment",
+      "Optimize logon scripts or Group Policy Objects (GPOs) that might be delaying the process",
+      "Implement network QoS to prioritize authentication and application traffic to/from the gateway"
+    ]
+  },
+  {
+    "id": "R038",
+    "category": "Performance",
+    "symptom": "Network monitoring system (NMS) shows frequent device unreachable alerts",
+    "conditions": [
+      "NMS sends alerts for devices that are confirmed to be online and operational",
+      "Ping tests to the 'unreachable' devices from the NMS server show intermittent timeouts or packet loss",
+      "NMS server itself is not overloaded (CPU/memory utilization is low)"
+    ],
+    "diagnosis": "Network congestion impacting NMS polling, SNMP agent issues, or NMS misconfiguration",
+    "solution": [
+      "Increase the polling interval for devices in the NMS to reduce network load and false positives",
+      "Verify SNMP community strings or credentials are correct on the devices and NMS",
+      "Check for network congestion between the NMS server and the monitored devices (e.g., WAN links)",
+      "Ensure the NMS server's network interface and connectivity to the network are stable",
+      "Review device syslog or SNMP trap logs for any messages related to network interface flapping or errors",
+      "Consider distributing NMS polling agents closer to remote network segments"
+    ]
+  },
+  {
+    "id": "R039",
+    "category": "Performance",
+    "symptom": "Large file transfers over SFTP/FTP are slower than expected",
+    "conditions": [
+      "Observed transfer rates are consistently below the rated network link speed (e.g., 100Mbps on a Gigabit link)",
+      "Server or client CPU utilization is low, indicating not a processing bottleneck",
+      "SFTP/FTP logs show retransmissions or delayed acknowledgements"
+    ],
+    "diagnosis": "TCP window size issues, firewall/NAT traversal problems, or disk I/O bottleneck on server/client",
+    "solution": [
+      "Ensure TCP window scaling is enabled on both the SFTP/FTP client and server operating systems",
+      "Check the MTU settings along the network path to prevent fragmentation and reassembly overhead",
+      "Verify the performance of the disk subsystem on both the source and destination for I/O bottlenecks",
+      "Review firewall configurations for any deep packet inspection or NAT traversal issues affecting large transfers",
+      "Try different SFTP/FTP client software or server implementations to rule out software-specific issues",
+      "Use tools like `iperf` or `nuttcp` to test raw TCP throughput between the endpoints to isolate network vs. application performance"
+    ]
+  },
+  {
+    "id": "R040",
+    "category": "Performance",
+    "symptom": "Virtualized desktop infrastructure (VDI) sessions are laggy and unresponsive",
+    "conditions": [
+      "Users report slow mouse movements, delayed keyboard input, and pixelation within VDI sessions",
+      "Network latency from thin clients/workstations to VDI brokers/hosts is consistently high",
+      "VDI host CPU/memory/disk I/O utilization is within acceptable limits"
+    ],
+    "diagnosis": "Network latency/jitter to VDI infrastructure, insufficient bandwidth, or display protocol issues",
+    "solution": [
+      "Minimize network latency and jitter between VDI clients and the VDI infrastructure (brokers, session hosts)",
+      "Ensure sufficient network bandwidth for VDI sessions, especially for rich media or graphics-intensive workloads",
+      "Optimize the VDI display protocol settings (e.g., compression, image quality) to match available bandwidth",
+      "Check for network congestion on switches and routers in the VDI traffic path",
+      "Consider using a dedicated network segment for VDI traffic to isolate it from other network contention",
+      "Upgrade network infrastructure to 10GbE or higher where VDI hosts and storage are connected"
+    ]
+  }
+]

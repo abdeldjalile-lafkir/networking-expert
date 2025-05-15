@@ -1,0 +1,382 @@
+[
+  {
+    "id": "R061",
+    "category": "Firewall",
+    "symptom": "Cannot access a specific internal server/service from the network",
+    "conditions": [
+      "`ping` to the server's IP address is successful, but `telnet <server_ip> <port>` fails",
+      "Error message 'Connection refused' or 'Connection timed out' in client application",
+      "Firewall logs on the server or network firewall show packets being dropped or denied for the specific port"
+    ],
+    "diagnosis": "Firewall on the server or network firewall blocking the port/service",
+    "solution": [
+      "Check the server's local firewall (e.g., `firewall-cmd --list-all` on Linux, Windows Firewall settings) and add a rule to allow the port",
+      "Verify the network firewall (e.g., router ACLs, dedicated firewall appliance) for rules blocking the specific source, destination, or port",
+      "Temporarily disable the firewall on the server for testing purposes (if safe to do so) to confirm it's the cause",
+      "Inspect the order of firewall rules; a `DENY` rule might be overriding an intended `ALLOW` rule",
+      "Check the firewall's traffic logs for specific drop reasons or matching policies",
+      "Ensure that the service on the server is actually listening on the expected port (`netstat -an | grep <port>`)"
+    ]
+  },
+  {
+    "id": "R062",
+    "category": "Firewall",
+    "symptom": "Internet access is denied for a specific group of users/VLAN",
+    "conditions": [
+      "Users in a particular VLAN cannot access external websites, but users in other VLANs can",
+      "Outbound `ping` to 8.8.8.8 from the affected VLAN fails at the internet gateway/firewall",
+      "Firewall logs show implicit deny for traffic originating from the affected VLAN"
+    ],
+    "diagnosis": "Firewall ACLs or security policies are explicitly denying internet access for the VLAN/group",
+    "solution": [
+      "Review the firewall security policies (ACLs, NAT rules) on the internet gateway that govern traffic from the affected VLAN",
+      "Ensure that the affected VLAN's subnet is included in the outbound NAT configuration if applicable",
+      "Check for any user-based authentication or group policies on the firewall that might be restricting access",
+      "Verify that routing is correctly configured for the affected VLAN to reach the internet gateway",
+      "Examine the firewall's zone configuration to ensure the VLAN is assigned to the correct security zone",
+      "Test by temporarily allowing all traffic from the affected VLAN (in a controlled test environment) to confirm it's a firewall rule issue"
+    ]
+  },
+  {
+    "id": "R063",
+    "category": "Firewall",
+    "symptom": "VPN users cannot access specific internal resources after connecting",
+    "conditions": [
+      "VPN client shows 'Connected' status, but `ping` to internal server fails",
+      "Firewall on the VPN server/appliance shows packets being dropped that originate from the VPN tunnel interface",
+      "Routing table on the VPN server does not include routes to the internal resources through the tunnel"
+    ],
+    "diagnosis": "VPN tunnel security policies, firewall rules on VPN gateway, or routing issues over VPN",
+    "solution": [
+      "Verify that the VPN tunnel security policies (e.g., Interesting Traffic, Crypto ACLs) on the VPN gateway permit access to the specific internal resources",
+      "Check firewall rules on the VPN gateway to ensure traffic originating from the VPN pool addresses is allowed to internal networks",
+      "Ensure that the internal network routes are properly pushed to VPN clients or known by the VPN gateway",
+      "Review firewall logs on the VPN gateway for specific deny entries related to VPN traffic",
+      "Confirm that split tunneling is configured correctly if users should only access internal resources via VPN",
+      "Test by connecting to different internal resources to narrow down the issue to specific servers or services"
+    ]
+  },
+  {
+    "id": "R064",
+    "category": "Firewall",
+    "symptom": "Port forwarding/NAT translation not working for external access to internal server",
+    "conditions": [
+      "External access to `public_ip:public_port` fails, but local access to `internal_ip:internal_port` works",
+      "Firewall's NAT table or port forwarding rules show no active translation or incorrect configuration",
+      "Packet capture on the firewall shows inbound packets reaching the WAN interface but not being forwarded to the internal server"
+    ],
+    "diagnosis": "Incorrect port forwarding/NAT rule, firewall blocking the forwarded port, or internal server's firewall",
+    "solution": [
+      "Double-check the port forwarding/NAT rule on the firewall/router for correct external port, internal IP, and internal port mapping",
+      "Ensure the firewall rule explicitly allows inbound traffic on the external port to be forwarded to the internal IP",
+      "Verify that the internal server's local firewall is not blocking the incoming connection on its internal port",
+      "Check if the ISP provides a public IP address (not CGNAT) that allows inbound connections",
+      "Perform a `telnet` test from an external network to `public_ip:public_port` to verify port accessibility",
+      "Review firewall logs for any deny entries related to the incoming connection"
+    ]
+  },
+  {
+    "id": "R065",
+    "category": "Firewall",
+    "symptom": "Firewall is blocking legitimate applications or updates",
+    "conditions": [
+      "Specific applications fail to connect to their update servers or licensing servers",
+      "Application logs show 'Connection Blocked by Firewall' or similar messages",
+      "Firewall logs show packets being denied based on application control or content filtering rules"
+    ],
+    "diagnosis": "Application control, content filtering, or specific port/protocol rules blocking the application",
+    "solution": [
+      "Identify the specific ports and protocols used by the application for updates/licensing",
+      "Create explicit firewall rules to allow the necessary ports/protocols for the application's traffic",
+      "If using application control, verify that the application is classified correctly and allowed by policy",
+      "Check content filtering or URL filtering rules that might be blocking access to the application's domain",
+      "Review the firewall's logging for any specific signatures or reasons for blocking the application's traffic",
+      "Temporarily disable granular firewall features (e.g., IPS, Application Control) for testing to isolate the issue"
+    ]
+  },
+  {
+    "id": "R066",
+    "category": "Firewall",
+    "symptom": "Traffic between internal VLANs is being blocked by the firewall",
+    "conditions": [
+      "Devices in one VLAN cannot communicate with devices in another VLAN, but can communicate within their own VLAN",
+      "Inter-VLAN routing is confirmed to be working on the router/Layer 3 switch",
+      "Firewall logs show deny entries for traffic attempting to cross between the VLANs"
+    ],
+    "diagnosis": "Inter-VLAN firewall rules, zone-based firewall issues, or incorrect security zones",
+    "solution": [
+      "Verify that firewall rules explicitly permit traffic flow between the source and destination VLANs/subnets",
+      "If using a zone-based firewall, ensure both VLANs are assigned to appropriate security zones and inter-zone policies allow communication",
+      "Check for any existing ACLs or security policies that might be implicitly denying inter-VLAN traffic",
+      "Review the firewall's routing table to ensure it has routes for both VLANs",
+      "Perform a `traceroute` between devices in different VLANs to confirm the firewall is the hop where traffic is dropped",
+      "Ensure the firewall has knowledge of the VLAN interfaces and their IP addresses"
+    ]
+  },
+  {
+    "id": "R067",
+    "category": "Firewall",
+    "symptom": "User cannot connect to an SSH server on a remote network",
+    "conditions": [
+      "`ssh <remote_ip>` command times out or shows 'Connection refused'",
+      "`telnet <remote_ip> 22` fails from the client",
+      "Remote server's SSH daemon is running and listening on port 22"
+    ],
+    "diagnosis": "Firewall blocking SSH port (22) on client side, server side, or network path",
+    "solution": [
+      "Check the client's local firewall to ensure outbound connections on port 22 are allowed",
+      "Verify the remote SSH server's local firewall (e.g., `ufw status`, `iptables -L`) allows inbound connections on port 22",
+      "Inspect any network firewalls between the client and the server that might be blocking TCP port 22",
+      "Ensure the SSH server is configured to listen on port 22 (check `sshd_config`) and is running",
+      "If SSH is configured on a non-standard port, ensure the client is attempting to connect to the correct port",
+      "Review firewall logs on both client's network egress point and server's ingress point"
+    ]
+  },
+  {
+    "id": "R068",
+    "category": "Firewall",
+    "symptom": "Outbound emails are blocked by the perimeter firewall",
+    "conditions": [
+      "SMTP client receives 'Connection refused' or 'Timed out' when sending emails to external recipients",
+      "Perimeter firewall logs show denied connections for outbound SMTP (TCP port 25)",
+      "Mail server is configured to send emails on port 25 to external mail servers"
+    ],
+    "diagnosis": "Perimeter firewall blocking outbound SMTP, ISP blocking port 25, or anti-spam/malware feature blocking",
+    "solution": [
+      "Verify that the perimeter firewall explicitly allows outbound TCP port 25 traffic from your mail server's IP address",
+      "Check if your ISP is blocking outbound port 25 traffic (common for residential lines) and consider using a submission port (587) or relay",
+      "If the firewall has anti-spam or malware features, ensure they are not inadvertently blocking legitimate outbound emails",
+      "Review any content filtering or reputation-based blocking rules that might apply to outbound SMTP",
+      "Ensure the mail server is configured to use a smart host or relay if required by ISP or policy",
+      "Perform a `telnet <external_mail_server_ip> 25` from the mail server to test connectivity"
+    ]
+  },
+  {
+    "id": "R069",
+    "category": "Firewall",
+    "symptom": "Firewall alerts about unusual outbound connections to suspicious IPs",
+    "conditions": [
+      "Firewall generates high volume of alerts for outbound connections to known malicious IP addresses or domains",
+      "Internal host traffic matches signatures of botnets or malware communication",
+      "Affected internal hosts show signs of compromise (e.g., high CPU, unusual processes)"
+    ],
+    "diagnosis": "Compromised internal host, malware infection, or misconfigured application trying to connect to unauthorized sites",
+    "solution": [
+      "Isolate the affected internal host(s) from the network immediately to prevent further compromise or spread",
+      "Perform a full antivirus/malware scan on the isolated host(s) to remove threats",
+      "Analyze the firewall logs to identify the source process or application initiating the suspicious connections",
+      "Update security patches on the affected host and review user accounts for unauthorized access",
+      "Implement tighter egress filtering rules on the firewall to prevent connections to known bad IPs/domains",
+      "Conduct a forensic investigation to determine the extent of the compromise and root cause"
+    ]
+  },
+  {
+    "id": "R070",
+    "category": "Firewall",
+    "symptom": "Traffic from a specific source IP is being dropped by the firewall",
+    "conditions": [
+      "Applications on a server with a specific source IP cannot connect to external resources",
+      "Firewall logs show 'deny' for packets originating from that specific source IP",
+      "Other servers on the same network segment can communicate externally without issues"
+    ],
+    "diagnosis": "Explicit firewall rule blocking the source IP, IP spoofing detection, or blacklisting",
+    "solution": [
+      "Check for any explicit firewall rules (ACLs, security policies) that are configured to deny traffic from the specific source IP",
+      "Verify if the firewall has any anti-spoofing measures or blacklists that might be inadvertently blocking the IP",
+      "Ensure the source IP is not associated with any security zones or policies that have restrictive access",
+      "Review recent changes to the firewall configuration for any newly added rules that might be causing the issue",
+      "Check for any routing issues that might cause the traffic to take an unexpected path and hit a different firewall rule",
+      "Test by temporarily allowing traffic from that specific source IP (in a controlled manner) to confirm the firewall rule is the cause"
+    ]
+  },
+  {
+    "id": "R071",
+    "category": "Firewall",
+    "symptom": "Firewall's CPU usage is consistently high, impacting performance",
+    "conditions": [
+      "Firewall management interface is slow or unresponsive",
+      "Network throughput through the firewall is significantly reduced",
+      "Firewall CPU utilization stays above 80-90% for extended periods"
+    ],
+    "diagnosis": "High traffic load, complex rule sets, resource-intensive security features, or hardware limitation",
+    "solution": [
+      "Identify the source of high traffic load using firewall logs or traffic monitoring tools",
+      "Optimize firewall rules by consolidating redundant rules, placing frequently hit rules at the top, and using groups",
+      "Disable or optimize resource-intensive security features (e.g., deep packet inspection, IPS/IDS, application control) if not critical",
+      "Review firewall hardware specifications and consider upgrading to a more powerful model if it's consistently undersized",
+      "Check for any large-scale attacks or unusual traffic patterns that might be overwhelming the firewall",
+      "Ensure the firewall firmware is up-to-date and that it has sufficient memory"
+    ]
+  },
+  {
+    "id": "R072",
+    "category": "Firewall",
+    "symptom": "Remote access to network devices (routers, switches) is denied via specific protocols (e.g., HTTPS, SNMP)",
+    "conditions": [
+      "Attempts to connect to device management interface (e.g., web UI, SSH) fail or time out",
+      "SNMP polling for network device metrics fails from the NMS",
+      "Firewall ACLs or VTY line access lists on the device are configured incorrectly"
+    ],
+    "diagnosis": "Firewall or device ACL blocking management traffic, or service not running",
+    "solution": [
+      "Check the firewall rules that protect the management interfaces of network devices to ensure specific protocols (e.g., TCP 443 for HTTPS, TCP 22 for SSH, UDP 161/162 for SNMP) are allowed from management subnets",
+      "Verify any access lists configured on the VTY lines or local interfaces of the network devices themselves",
+      "Ensure the management services (HTTPS, SSH, SNMP) are running and configured correctly on the network devices",
+      "Confirm that the source IP of the management workstation/NMS is permitted by the rules",
+      "Test connectivity using `telnet <device_ip> <port>` from the management workstation",
+      "Review device logs for any access denied messages or attempts from unauthorized IPs"
+    ]
+  },
+  {
+    "id": "R073",
+    "category": "Firewall",
+    "symptom": "Intrusion Prevention System (IPS) generates false positives, blocking legitimate traffic",
+    "conditions": [
+      "Legitimate application traffic is being identified as malicious by the IPS and dropped",
+      "IPS logs show specific signature matches for benign traffic",
+      "Users report sporadic connectivity issues to applications that are known to be safe"
+    ],
+    "diagnosis": "Overly aggressive IPS signatures, outdated signature definitions, or misconfigured IPS policies",
+    "solution": [
+      "Identify the specific IPS signature causing the false positive and create an exclusion or exception rule for the legitimate traffic",
+      "Ensure IPS signature definitions are regularly updated to the latest versions",
+      "Adjust the IPS policy to use a less aggressive profile or disable specific signatures that are consistently causing false positives",
+      "Monitor the IPS logs closely after making changes to ensure legitimate traffic is no longer blocked",
+      "Perform a packet capture on the IPS interface to analyze the blocked traffic and confirm the signature match",
+      "Consult the IPS vendor's documentation or support for guidance on tuning signature policies"
+    ]
+  },
+  {
+    "id": "R074",
+    "category": "Firewall",
+    "symptom": "Firewall does not block unauthorized access attempts as expected",
+    "conditions": [
+      "Firewall logs show successful connections from unauthorized source IPs or to unauthorized ports",
+      "Security vulnerability scans reveal open ports that should be closed by the firewall",
+      "Known malicious traffic successfully traverses the firewall"
+    ],
+    "diagnosis": "Incorrect firewall rule order, missing implicit deny, or misconfigured security zones",
+    "solution": [
+      "Review the firewall rule set for any rules that might inadvertently allow unauthorized traffic (e.g., overly permissive `ALLOW` rules)",
+      "Ensure that there is an explicit 'deny all' or 'implicit deny' rule at the end of the firewall policy chain",
+      "Check the order of firewall rules; specific `DENY` rules should generally precede more general `ALLOW` rules",
+      "Verify that the correct interfaces and security zones are associated with the firewall rules",
+      "Perform a manual review of the firewall configuration to ensure it aligns with the security policy",
+      "Test the firewall's effectiveness using port scanners or penetration testing tools from various network segments"
+    ]
+  },
+  {
+    "id": "R075",
+    "category": "Firewall",
+    "symptom": "Firewall is unable to maintain state for certain connections (e.g., VoIP, large file transfers)",
+    "conditions": [
+      "VoIP calls drop after a few minutes or one-way audio occurs",
+      "Large file transfers stall or fail midway through",
+      "Firewall's connection table shows sessions being terminated prematurely or not being established properly"
+    ],
+    "diagnosis": "Short connection timeouts, insufficient state table capacity, or deep packet inspection issues",
+    "solution": [
+      "Increase connection timeout values for relevant protocols (e.g., UDP for VoIP) on the firewall",
+      "Check the firewall's state table size and maximum concurrent connections; consider upgrading hardware if insufficient",
+      "If deep packet inspection (DPI) is enabled, try disabling it for specific traffic types or on certain interfaces",
+      "Review firewall logs for any errors related to session management or connection tracking",
+      "Ensure the firewall firmware is up-to-date, as it might contain bug fixes for stateful inspection issues",
+      "Check for NAT or PAT issues that might be altering source/destination ports mid-connection"
+    ]
+  },
+  {
+    "id": "R076",
+    "category": "Firewall",
+    "symptom": "Application traffic with dynamic ports (e.g., FTP passive mode, some RPC) is blocked",
+    "conditions": [
+      "Applications that use dynamic ports for data channels fail to establish full connections",
+      "Firewall logs show initial control connection allowed, but subsequent data channel connections are denied",
+      "Active FTP works, but passive FTP fails"
+    ],
+    "diagnosis": "Firewall not configured for Application Layer Gateway (ALG) or specific port ranges for dynamic protocols",
+    "solution": [
+      "Enable the appropriate Application Layer Gateway (ALG) for the protocol (e.g., FTP ALG) on the firewall",
+      "Configure the firewall to allow the specific port ranges used by the application for its dynamic data channels",
+      "If possible, configure the application to use fixed, known ports instead of dynamic ones",
+      "Review the firewall's inspection policies to ensure they are properly identifying and handling dynamic port protocols",
+      "Check for any NAT issues that might be preventing the firewall from tracking the dynamic port allocations",
+      "Consult the firewall vendor's documentation for specific recommendations on handling dynamic port protocols"
+    ]
+  },
+  {
+    "id": "R077",
+    "category": "Firewall",
+    "symptom": "Firewall management access via VPN is blocked",
+    "conditions": [
+      "Cannot access the firewall's web UI or SSH interface after connecting via VPN",
+      "Ping to the firewall's internal IP is successful from the VPN client",
+      "Firewall logs show no attempt or deny for management access from VPN pool IPs"
+    ],
+    "diagnosis": "Firewall's management access control list (ACL) or VPN-to-interface policies",
+    "solution": [
+      "Verify that the firewall's management access list or rules explicitly permit traffic from the VPN client IP range (VPN pool)",
+      "Ensure that the VPN tunnel itself allows access to the firewall's internal management interface",
+      "Check the firewall's routing table to ensure VPN traffic can reach the management interface",
+      "Review any specific firewall policies related to VPN users accessing internal network services, including the firewall itself",
+      "If using a dedicated management interface, ensure its security policies are correctly configured to allow VPN access",
+      "Restart the VPN service on the firewall to ensure policy changes are applied"
+    ]
+  },
+  {
+    "id": "R078",
+    "category": "Firewall",
+    "symptom": "Firewall is showing 'session table full' errors or dropping new connections",
+    "conditions": [
+      "New connections are failing to establish, but existing connections remain active",
+      "Firewall logs show 'session table full' or 'connection limit reached' errors",
+      "Firewall's monitoring shows session count at or near its maximum capacity"
+    ],
+    "diagnosis": "Insufficient session table capacity, high connection rate, or a connection flood attack",
+    "solution": [
+      "Increase the maximum session table size on the firewall if the hardware supports it and resources are available",
+      "Implement connection rate limiting policies on the firewall to prevent specific sources from consuming too many sessions",
+      "Identify the source of the high connection rate (e.g., a misbehaving application, a bot, or a DoS attack) using firewall logs or `netstat` on internal servers",
+      "Consider upgrading the firewall hardware to a model with higher session capacity",
+      "Optimize firewall rules to reduce the number of sessions (e.g., avoid unnecessary deep inspection)",
+      "Implement SYN flood protection or other DoS/DDoS mitigation techniques if under attack"
+    ]
+  },
+  {
+    "id": "R079",
+    "category": "Firewall",
+    "symptom": "Local firewall (e.g., Windows Defender Firewall) is not starting or disabled",
+    "conditions": [
+      "Windows Security Center reports 'Firewall is Off' or 'Action needed'",
+      "Attempts to enable the firewall via services or control panel fail with an error",
+      "System event logs show errors related to the firewall service (e.g., Event ID 7024, 7023)"
+    ],
+    "diagnosis": "Corrupted firewall service, conflicting security software, or malware disabling firewall",
+    "solution": [
+      "Check the status of the Windows Firewall service (`net start MpsSvc`) and attempt to start it manually",
+      "Run System File Checker (`sfc /scannow`) to check for corrupted system files",
+      "Temporarily disable any third-party antivirus or security software to check for conflicts",
+      "Scan the system for malware or viruses that might be disabling security services",
+      "Reset Windows Firewall to default settings (`netsh advfirewall reset`)",
+      "Consider performing an in-place upgrade of Windows or system restore to a previous working state"
+    ]
+  },
+  {
+    "id": "R080",
+    "category": "Firewall",
+    "symptom": "Firewall is blocking legitimate ICMP traffic (ping, traceroute)",
+    "conditions": [
+      "Ping to internal or external hosts fails when firewall is enabled, but succeeds when disabled",
+      "`traceroute` terminates at the firewall device",
+      "Firewall logs show deny entries for ICMP traffic"
+    ],
+    "diagnosis": "Explicit firewall rule denying ICMP, or default deny policy for ICMP",
+    "solution": [
+      "Create or modify a firewall rule to explicitly allow ICMP traffic (Echo Request/Reply) for troubleshooting purposes",
+      "If using a stateful firewall, ensure that ICMP replies are allowed back for outgoing ping requests",
+      "Check for any specific security policies or IPS signatures that might be treating ICMP as malicious (e.g., ICMP flood protection)",
+      "Ensure that the firewall's global ICMP settings are not configured to deny all ICMP traffic",
+      "Review the firewall's logging to see which specific rule is blocking the ICMP traffic",
+      "Limit the scope of the ICMP allow rule to specific source IPs or networks if broad access is not desired"
+    ]
+  }
+]

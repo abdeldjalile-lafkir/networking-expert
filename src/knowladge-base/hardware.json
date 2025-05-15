@@ -1,0 +1,443 @@
+[
+  {
+    "id": "R121",
+    "category": "Hardware",
+    "symptom": "Network Interface Card (NIC) Link light is off",
+    "conditions": [
+      "Computer reports 'No network connection' or 'Network cable unplugged'.",
+      "NIC Link/Activity LED on the back of the computer is not illuminated.",
+      "No traffic is observed on the associated switch port's link light.",
+      "Device Manager (Windows) or `ip link show` (Linux) shows the NIC as 'disconnected' or 'down'.",
+      "Swapping network cable or connecting to a different switch port yields the same result."
+    ],
+    "diagnosis": "Faulty cable, incorrect cable type, disabled NIC, or hardware failure of the NIC.",
+    "solution": [
+      "Ensure the Ethernet cable is securely plugged into both the NIC and the network switch/router.",
+      "Try a different, known-good Ethernet cable.",
+      "Verify that the network port on the switch/router is active and working (check link light on switch).",
+      "Check the operating system's network adapter settings to ensure the NIC is enabled (e.g., 'Enable adapter' in Windows, `ip link set eth0 up` in Linux).",
+      "Update or reinstall the NIC drivers to the latest version.",
+      "Test the NIC by connecting it to a different computer or network device if possible.",
+      "If all troubleshooting steps fail, the NIC may be faulty and require replacement."
+    ]
+  },
+  {
+    "id": "R122",
+    "category": "Hardware",
+    "symptom": "Network switch ports are not lighting up",
+    "conditions": [
+      "Connected devices (computers, servers) report 'No network connection'.",
+      "No Link/Activity LEDs are illuminated on the switch for specific ports or all ports.",
+      "Switch is powered on, but no devices are connecting or communicating through it.",
+      "Power cycling the switch does not resolve the issue.",
+      "Swapping cables or connecting known-good devices to the ports still shows no link."
+    ],
+    "diagnosis": "Faulty switch port, incorrect cable, power issue to the switch, or internal switch hardware failure.",
+    "solution": [
+      "Verify that the switch has stable power and its power indicator LED is solid green.",
+      "Try connecting the device to a different port on the same switch to confirm if it's a port-specific issue.",
+      "Use a known-good Ethernet cable to rule out cable faults.",
+      "Perform a power cycle (unplug, wait 30 seconds, plug back in) of the network switch.",
+      "Check the switch's web interface or console for port status and error messages if it's a managed switch.",
+      "Reset the switch to factory defaults as a last resort (note: this will erase all configurations).",
+      "If multiple ports or all ports are unresponsive, the switch may be faulty and require replacement."
+    ]
+  },
+  {
+    "id": "R123",
+    "category": "Hardware",
+    "symptom": "Router not powering on",
+    "conditions": [
+      "No indicator lights (power, WAN, LAN) are illuminated on the router.",
+      "Router does not respond to pressing the power button (if applicable).",
+      "Power outlet is confirmed to be working (e.g., by plugging in another device).",
+      "Power adapter unit feels cold and shows no signs of life.",
+      "Using a different power adapter (if compatible and available) yields the same result."
+    ],
+    "diagnosis": "Faulty power adapter, faulty power cable, or router hardware failure (dead power supply circuit).",
+    "solution": [
+      "Verify the power cable is securely connected to the router and the power outlet.",
+      "Ensure the power outlet is functional by testing it with another electrical device.",
+      "Inspect the power adapter for any visible damage (e.g., frayed cable, burnt smell).",
+      "If possible, try using a different, compatible power adapter from a known working device.",
+      "Plug the router directly into a wall outlet, bypassing surge protectors or power strips.",
+      "Check the router's manual for specific power troubleshooting steps or hard reset procedures.",
+      "If the router still does not power on, it is likely a hardware failure and requires replacement."
+    ]
+  },
+  {
+    "id": "R124",
+    "category": "Hardware",
+    "symptom": "Wireless Access Point (WAP) not broadcasting SSID",
+    "conditions": [
+      "Wi-Fi networks are not visible on client devices (laptops, smartphones).",
+      "WAP's status LEDs (e.g., Wi-Fi, Status) are off or blinking unusually.",
+      "WAP appears to be powered on but clients cannot connect.",
+      "WAP's web interface or management console is unreachable.",
+      "Other wired devices connected to the same network infrastructure are functioning correctly."
+    ],
+    "diagnosis": "WAP power failure, radio disabled, SSID broadcast turned off, or WAP hardware fault.",
+    "solution": [
+      "Verify the WAP is powered on and its power LED is illuminated.",
+      "Perform a power cycle on the WAP (unplug, wait 30 seconds, plug back in).",
+      "Access the WAP's management interface via wired connection (if possible) and ensure the wireless radio is enabled and SSID broadcast is active.",
+      "Check for any scheduled Wi-Fi shutdowns or hidden SSID settings on the WAP.",
+      "Ensure the WAP's firmware is up-to-date.",
+      "Try resetting the WAP to factory defaults (note: this will erase all configurations and might require re-setup).",
+      "If the WAP is still not broadcasting, it may be faulty and require replacement or professional repair."
+    ]
+  },
+  {
+    "id": "R125",
+    "category": "Hardware",
+    "symptom": "Cable tester shows open circuit or short circuit",
+    "conditions": [
+      "Cable tester indicates 'Open' for one or more wires.",
+      "Cable tester indicates 'Short' between two or more wires.",
+      "Network device connected via the cable reports 'No Link' or 'Disconnected'.",
+      "Connectivity issues are isolated to a specific cable run.",
+      "Visual inspection of cable ends (RJ45 connectors) shows damaged pins or improper crimping."
+    ],
+    "diagnosis": "Damaged network cable, faulty connector, or improper termination.",
+    "solution": [
+      "Replace the faulty network cable with a known-good, tested cable.",
+      "If the cable is permanently installed (e.g., in-wall), replace the RJ45 connectors on both ends (re-termination).",
+      "Ensure the cable is properly terminated according to T568A or T568B wiring standards.",
+      "Check for kinks, cuts, or severe bends in the cable that could cause internal damage.",
+      "If the cable run is very long, consider segmenting it or using a network repeater.",
+      "Verify that the cable is the correct type (e.g., Cat5e, Cat6) for the network speed requirements.",
+      "For fiber optic cables, clean the connectors with appropriate cleaning tools and check for micro-bends."
+    ]
+  },
+  {
+    "id": "R126",
+    "category": "Hardware",
+    "symptom": "Server NIC reports 'No network connection'",
+    "conditions": [
+      "Server operating system indicates no network connectivity.",
+      "NIC activity lights are off or showing abnormal behavior.",
+      "No IP address obtained via DHCP or static IP not reachable.",
+      "Device Manager (Windows) or `lshw -C network` (Linux) shows the NIC as disabled, errored, or missing.",
+      "Swapping the Ethernet cable and switch port does not resolve the issue."
+    ],
+    "diagnosis": "NIC driver issue, NIC disabled in BIOS/OS, hardware failure of the NIC, or faulty motherboard slot.",
+    "solution": [
+      "Verify that the Ethernet cable is securely connected to the server's NIC and the network switch.",
+      "Check the server's BIOS/UEFI settings to ensure the NIC is enabled.",
+      "In the operating system, ensure the NIC is enabled and not disabled or in an error state.",
+      "Update or reinstall the NIC drivers, ensuring they are compatible with the server's OS version.",
+      "If multiple NICs are present, try using a different one.",
+      "Test the NIC by connecting it to a different switch or known working port.",
+      "If it's a PCIe expansion card, reseat the card in its slot. If issue persists, try a different PCIe slot or replace the NIC."
+    ]
+  },
+  {
+    "id": "R127",
+    "category": "Hardware",
+    "symptom": "SFP transceiver link down",
+    "conditions": [
+      "No link light on the switch port where the SFP is inserted.",
+      "Associated fiber cable shows no light transmission at one end.",
+      "Switch logs report 'interface down' or 'SFP error' messages.",
+      "Multiple SFP transceivers tried in the same port produce the same result.",
+      "The remote end connected to the SFP also reports link down."
+    ],
+    "diagnosis": "Faulty SFP transceiver, dirty/damaged fiber optic cable, incompatible SFP, or faulty switch port.",
+    "solution": [
+      "Inspect the SFP transceiver and the fiber optic cable connectors for any visible damage or dirt. Clean connectors with appropriate tools.",
+      "Ensure the SFP transceiver is fully seated in the switch port.",
+      "Try a different SFP transceiver that is known to be working and compatible with the switch.",
+      "Verify that the fiber optic cable is not bent beyond its minimum bend radius and is correctly terminated.",
+      "Check the switch's configuration to ensure the port is enabled and set to the correct speed/duplex.",
+      "Test the fiber optic cable with a fiber optic light source and power meter to verify continuity and signal strength.",
+      "If possible, try the SFP and fiber cable in a different switch port or a different switch to isolate the problem."
+    ]
+  },
+  {
+    "id": "R128",
+    "category": "Hardware",
+    "symptom": "Fiber optic cable damage detected",
+    "conditions": [
+      "Optical power meter shows significantly reduced light transmission or no light.",
+      "Visible damage to the fiber cable jacket (e.g., cuts, crushing, severe kinks).",
+      "SFP transceivers at both ends report 'link down' or 'no receive signal'.",
+      "OTDR (Optical Time-Domain Reflectometer) trace shows a break or high loss point.",
+      "Connectivity issues are limited to devices connected via the specific fiber run."
+    ],
+    "diagnosis": "Physical damage to the fiber cable, improper handling, or environmental stress.",
+    "solution": [
+      "Locate the exact point of damage through visual inspection or using an OTDR.",
+      "Repair the damaged section of the fiber cable by fusion splicing or mechanical splicing if feasible and within budget.",
+      "If the damage is extensive or in a critical location, replace the entire fiber run.",
+      "Ensure proper cable management and protection to prevent future damage (e.g., using conduit, avoiding sharp bends).",
+      "Clean all fiber optic connectors before insertion using specialized cleaning kits.",
+      "Verify that the correct type of fiber cable (e.g., multimode, single-mode) is being used for the application.",
+      "Perform post-repair testing with an optical power meter and/or OTDR to confirm integrity."
+    ]
+  },
+  {
+    "id": "R129",
+    "category": "Hardware",
+    "symptom": "Hard drive failure affecting network services",
+    "conditions": [
+      "Server hosting network services (e.g., DNS, DHCP, File Server) experiences slow response times or crashes.",
+      "System logs report I/O errors, disk read/write failures, or SMART errors for a hard drive.",
+      "Operating system on the server becomes unresponsive or fails to boot.",
+      "RAID array reports a degraded state or a failed disk.",
+      "Network services fail to start or continuously restart."
+    ],
+    "diagnosis": "Degraded or failed hard drive leading to OS instability or data corruption affecting network service files.",
+    "solution": [
+      "Check the server's RAID controller status and replace any failed drives in the array.",
+      "If not in a RAID configuration, attempt to back up critical data from the failing drive immediately.",
+      "Replace the faulty hard drive and reinstall the operating system and network services.",
+      "Run disk diagnostic tools (e.g., `chkdsk` on Windows, `fsck` on Linux) to repair file system errors.",
+      "Ensure server firmware (BIOS/UEFI, RAID controller) is up-to-date.",
+      "Verify that the server has adequate ventilation to prevent overheating of components, including hard drives.",
+      "Implement proactive monitoring for hard drive health using SMART data to predict failures."
+    ]
+  },
+  {
+    "id": "R130",
+    "category": "Hardware",
+    "symptom": "Router/Switch fan noise is excessive",
+    "conditions": [
+      "Fan noise from the network device is significantly louder than normal operating levels.",
+      "Device enclosure feels unusually hot to the touch.",
+      "Device performance degrades (e.g., packet loss, slow response times).",
+      "System logs report fan speed warnings or temperature alerts.",
+      "Visible dust buildup on fan vents or within the device."
+    ],
+    "diagnosis": "Dust accumulation, failing fan bearing, clogged ventilation, or overloaded components leading to overheating.",
+    "solution": [
+      "Shut down the device and carefully clean dust from fan vents and internal components using compressed air.",
+      "Ensure the device is in an environment with adequate airflow and proper ventilation (e.g., in a server rack with sufficient cooling).",
+      "Monitor the device's internal temperature and fan speeds via its management interface.",
+      "If a specific fan is failing (e.g., grinding noise), arrange for its replacement if it's a modular component.",
+      "Reduce the workload on the device if possible to decrease heat generation.",
+      "Verify that the ambient room temperature is within the device's specified operating range.",
+      "If noise persists after cleaning and cooling optimization, the fan or internal components may be failing."
+    ]
+  },
+  {
+    "id": "R131",
+    "category": "Hardware",
+    "symptom": "Power supply unit (PSU) failure in network device",
+    "conditions": [
+      "Network device (e.g., switch, firewall appliance) suddenly loses power or fails to boot.",
+      "No indicator lights are illuminated on the device or its power supply.",
+      "PSU fan stops spinning or makes unusual noise.",
+      "Smell of burning electronics emanating from the device.",
+      "Output voltage measurements on the PSU (if accessible and safe to test) are incorrect or absent."
+    ],
+    "diagnosis": "PSU component failure, short circuit, or internal power delivery issue.",
+    "solution": [
+      "Ensure the power cable is securely connected to the PSU and the power outlet.",
+      "Test the power outlet with another device to confirm it's supplying power.",
+      "If the device has redundant PSUs, check the status of the other PSU and ensure it can carry the load.",
+      "Replace the faulty PSU with a compatible, known-good replacement.",
+      "If the PSU is internal and not replaceable, the entire device may need to be replaced.",
+      "Check for any external physical damage to the PSU or its connecting cables.",
+      "Inspect internal components for signs of shorting or burning if safe to do so."
+    ]
+  },
+  {
+    "id": "R132",
+    "category": "Hardware",
+    "symptom": "Patch panel port showing no connectivity",
+    "conditions": [
+      "Device connected to the patch panel port reports 'No network connection'.",
+      "Link light on the associated switch port is off.",
+      "Cable tester on the patch panel port shows an open circuit or incorrect wiring.",
+      "Punch-down termination on the patch panel appears loose or damaged.",
+      "Connecting directly to the wall jack or switch port bypasses the issue."
+    ],
+    "diagnosis": "Poor termination on the patch panel, faulty patch cable, or damaged patch panel port.",
+    "solution": [
+      "Re-punch down the wires on the patch panel port, ensuring proper termination (T568A or T568B).",
+      "Ensure the patch cable connecting the patch panel to the switch is known-good and securely connected.",
+      "Inspect the patch panel port for any physical damage or corrosion.",
+      "Test the entire cable run from the wall jack to the switch using a cable tester.",
+      "If a single port is faulty, consider using an adjacent, unused port on the patch panel.",
+      "Clean any dust or debris from the patch panel ports.",
+      "If multiple ports on the patch panel are failing, the patch panel itself might be faulty and require replacement."
+    ]
+  },
+  {
+    "id": "R133",
+    "category": "Hardware",
+    "symptom": "Bad port on a network switch",
+    "conditions": [
+      "Connecting a known-good device with a known-good cable to a specific switch port results in no link or intermittent connectivity.",
+      "Other ports on the same switch function correctly.",
+      "Switch logs report errors specific to the port (e.g., 'jabber', 'CRC error', 'port flapping').",
+      "The port's LED behaves abnormally (e.g., no link light, flickering constantly without activity).",
+      "Loopback test on the suspected port fails."
+    ],
+    "diagnosis": "Physical damage to the port, internal circuit failure, or firmware issue.",
+    "solution": [
+      "Try cleaning the port with compressed air to remove dust or debris.",
+      "Update the switch firmware to the latest version, as some port issues can be software-related.",
+      "Disable and then re-enable the port via the switch's management interface.",
+      "If the switch is managed, check for any port-specific configurations (e.g., VLAN, speed/duplex) that might be misconfigured.",
+      "Perform a factory reset on the switch as a last resort (note: this will erase all configurations).",
+      "Avoid using the faulty port and use an available spare port.",
+      "If the switch is under warranty or replaceable, replace the switch if multiple ports are failing or it's a critical device."
+    ]
+  },
+  {
+    "id": "R134",
+    "category": "Hardware",
+    "symptom": "Wireless access point is overheating",
+    "conditions": [
+      "WAP enclosure feels excessively hot to the touch.",
+      "WAP performance degrades significantly (e.g., dropped connections, slow speeds).",
+      "WAP spontaneously reboots or becomes unresponsive.",
+      "System logs (if available) show temperature warnings or CPU throttling.",
+      "Placement of the WAP is in an enclosed space or near a heat source."
+    ],
+    "diagnosis": "Inadequate ventilation, dust buildup, hardware component failure (e.g., heatsink, internal fan), or excessive ambient temperature.",
+    "solution": [
+      "Relocate the WAP to an open area with good airflow, away from direct sunlight or heat sources.",
+      "Ensure the WAP's ventilation holes are not blocked and clean any dust accumulation with compressed air.",
+      "Consider using active cooling solutions (e.g., a small USB fan) if passive cooling is insufficient.",
+      "Check the WAP's firmware for any updates that might improve power management or reduce heat generation.",
+      "Reduce the number of connected clients or disable unnecessary features if possible to lower workload.",
+      "Verify that the ambient temperature of the environment is within the WAP's specified operating range.",
+      "If overheating persists despite proper ventilation, the internal hardware might be failing and the WAP requires replacement."
+    ]
+  },
+  {
+    "id": "R135",
+    "category": "Hardware",
+    "symptom": "Network printer not responding",
+    "conditions": [
+      "Cannot ping the printer's IP address.",
+      "Printer's network status lights are off or blinking erratically.",
+      "Printer appears online on its display panel but cannot receive print jobs.",
+      "Other network devices connected to the same switch port are functional.",
+      "Printer cannot communicate with the print server or client workstations."
+    ],
+    "diagnosis": "Printer network interface card (NIC) issue, incorrect IP configuration, network cable problem, or printer hardware failure.",
+    "solution": [
+      "Perform a power cycle on the printer and its network switch.",
+      "Verify the Ethernet cable is securely connected to the printer's network port and the wall jack/switch.",
+      "Check the printer's network configuration (IP address, subnet mask, gateway) from its control panel.",
+      "If using DHCP, ensure the printer is obtaining an IP address and that the DHCP server is reachable.",
+      "Try connecting the printer to a different switch port or a different network cable.",
+      "Update the printer's firmware to the latest version.",
+      "Reset the printer's network settings to factory defaults and reconfigure them.",
+      "If the issue persists, the printer's network interface hardware may be faulty and require service or replacement."
+    ]
+  },
+  {
+    "id": "R136",
+    "category": "Hardware",
+    "symptom": "Server RAM failure causing network instability",
+    "conditions": [
+      "Server experiences random reboots, blue screens (Windows) or kernel panics (Linux).",
+      "System logs report memory errors or ECC (Error Correcting Code) warnings.",
+      "Network services hosted on the server become unresponsive or crash intermittently.",
+      "Running a memory diagnostic tool (e.g., Memtest86+) reports memory errors.",
+      "The server's network connectivity is erratic, with packet loss or dropped connections."
+    ],
+    "diagnosis": "Faulty RAM modules affecting the operating system's ability to process network traffic and manage resources.",
+    "solution": [
+      "Run a comprehensive memory diagnostic tool (e.g., Memtest86+) to identify faulty RAM modules.",
+      "If memory errors are found, identify and replace the faulty RAM modules.",
+      "Ensure RAM modules are properly seated in their slots.",
+      "Verify that the RAM modules are compatible with the server's motherboard and CPU.",
+      "Update the server's BIOS/UEFI firmware to the latest version.",
+      "If the server has multiple RAM modules, try operating with one module at a time to isolate the faulty one.",
+      "Check for proper server cooling and ensure RAM modules are not overheating."
+    ]
+  },
+  {
+    "id": "R137",
+    "category": "Hardware",
+    "symptom": "Firewall appliance not booting up",
+    "conditions": [
+      "No power indicator lights on the firewall appliance.",
+      "Appliance's fans are not spinning or making unusual noises.",
+      "Console access to the appliance shows no output or stops during boot sequence.",
+      "Connected network devices report no connectivity through the firewall.",
+      "Replacing the power cable or testing the power outlet yields no change."
+    ],
+    "diagnosis": "Power supply unit (PSU) failure, motherboard failure, or corrupted boot media.",
+    "solution": [
+      "Verify the power cable is securely connected and the power outlet is functioning.",
+      "If the appliance has redundant PSUs, check the status of the other PSU.",
+      "If possible, try a different, known-good power adapter/cable.",
+      "Connect a console cable to the appliance and observe the boot process for specific error messages.",
+      "Attempt to boot from a recovery image or USB drive if supported by the appliance.",
+      "Check the internal components for visible damage (e.g., burnt capacitors, loose connections) if safe and permissible.",
+      "If the appliance fails to power on or complete the boot process, it may require professional repair or replacement."
+    ]
+  },
+  {
+    "id": "R138",
+    "category": "Hardware",
+    "symptom": "KVM switch issues affecting console access to network devices",
+    "conditions": [
+      "No video output on the monitor when switching to a specific server/device via KVM.",
+      "Keyboard and mouse input are unresponsive on the target server/device.",
+      "KVM switch indicator lights (e.g., port selection) are behaving abnormally.",
+      "Directly connecting a monitor, keyboard, and mouse to the server/device works correctly.",
+      "Multiple servers/devices connected to the KVM exhibit the same issue."
+    ],
+    "diagnosis": "Faulty KVM cables, KVM switch hardware failure, or KVM firmware issues.",
+    "solution": [
+      "Ensure all KVM cables (video, keyboard, mouse, USB) are securely connected to both the KVM switch and the server/device.",
+      "Try swapping KVM cables with known-good ones, especially for the problematic port.",
+      "Perform a power cycle on the KVM switch.",
+      "Update the KVM switch firmware to the latest version.",
+      "If the KVM supports hot-plugging, try reconnecting the KVM cables to the server/device while it's powered on.",
+      "Try using a different port on the KVM switch or a different KVM switch altogether.",
+      "Verify that the KVM switch supports the resolution and refresh rate of the connected monitor."
+    ]
+  },
+  {
+    "id": "R139",
+    "category": "Hardware",
+    "symptom": "PoE (Power over Ethernet) device not receiving power",
+    "conditions": [
+      "PoE-powered device (e.g., IP phone, WAP, IP camera) does not power on.",
+      "PoE switch port status LED for power delivery is off or amber.",
+      "Device connects and gets link, but no power.",
+      "PoE switch logs report 'PoE budget exceeded' or 'PoE error' on the port.",
+      "Connecting the device to a power injector or local power supply makes it power on."
+    ],
+    "diagnosis": "PoE switch budget exceeded, faulty PoE port, non-PoE cable, or faulty PoE device.",
+    "solution": [
+      "Verify that the PoE switch has sufficient power budget available for all connected PoE devices.",
+      "Ensure the Ethernet cable used is capable of PoE (e.g., Cat5e or higher) and properly terminated.",
+      "Try connecting the PoE device to a different PoE-enabled port on the same switch or another PoE switch.",
+      "Check the PoE switch's management interface to ensure PoE is enabled on the specific port and configured correctly (e.g., auto-negotiate, specific PoE standard).",
+      "If the PoE device supports multiple PoE standards (e.g., 802.3af, 802.3at), ensure compatibility with the switch.",
+      "Perform a power cycle on the PoE switch.",
+      "Test the PoE device with a known-good PoE injector or local power supply to confirm the device itself is not faulty."
+    ]
+  },
+  {
+    "id": "R140",
+    "category": "Hardware",
+    "symptom": "Network device showing amber/red status LED",
+    "conditions": [
+      "Device's primary status LED is amber, red, or a non-standard color.",
+      "Device is not functioning as expected (e.g., no network connectivity, services down).",
+      "Device logs report critical errors, hardware failures, or overheating warnings.",
+      "Fan noise is excessive or non-existent.",
+      "Device spontaneously reboots or shuts down."
+    ],
+    "diagnosis": "Hardware failure (e.g., power supply, fan, internal component), overheating, or critical error requiring attention.",
+    "solution": [
+      "Consult the device's manual or manufacturer's website to understand the meaning of the specific LED color/pattern.",
+      "Check the device's internal temperature and fan status via its management interface or console.",
+      "Ensure proper ventilation and airflow around the device, and clean any dust buildup.",
+      "Review system logs for critical error messages that correspond to the status LED.",
+      "Perform a graceful shutdown and power cycle of the device.",
+      "If possible, run hardware diagnostics provided by the manufacturer.",
+      "If the LED indicates a critical hardware failure and troubleshooting doesn't resolve it, the device may need repair or replacement."
+    ]
+  }
+]

@@ -1,0 +1,382 @@
+[
+  {
+    "id": "R001",
+    "category": "Connectivity",
+    "symptom": "Cannot access the internet from a workstation",
+    "conditions": [
+      "Ping to 8.8.8.8 (Google DNS) fails",
+      "Ping to the default gateway (router IP) fails",
+      "Network interface status shows 'DOWN' or 'NO-CARRIER' (`ip link show`)"
+    ],
+    "diagnosis": "Local network issue, cable disconnection, or network interface is down",
+    "solution": [
+      "Check physical Ethernet cable connection to the workstation and network device (switch/router)",
+      "Ensure the network interface card (NIC) is enabled and up (`ip link set eth0 up` or similar)",
+      "Verify the link lights on the NIC and the switch/router port are lit and steady/blinking",
+      "Check for driver issues for the network adapter (e.g., `dmesg | grep -i eth` for errors)",
+      "Try connecting the workstation to a different port on the network switch/router",
+      "Reboot the workstation"
+    ]
+  },
+  {
+    "id": "R002",
+    "category": "Connectivity",
+    "symptom": "Workstation has 'Limited or No Connectivity' / APIPA address (169.254.x.x)",
+    "conditions": [
+      "Workstation's IP address is in the 169.254.0.0/16 range (`ip a` or `ipconfig /all`)",
+      "Cannot ping the default gateway",
+      "DHCP client service is running on the workstation"
+    ],
+    "diagnosis": "DHCP server not reachable, no DHCP lease, or IP address conflict",
+    "solution": [
+      "Renew DHCP lease (`dhclient -r && dhclient` or `ipconfig /release && ipconfig /renew`)",
+      "Verify the DHCP server is operational and reachable on the network",
+      "Check for any IP address conflicts using `arp -a` or network scanner tools",
+      "Ensure no MAC address filtering is enabled on the router/switch that would block the workstation",
+      "Restart the NetworkManager or networking service on the workstation",
+      "Temporarily assign a static IP address to test basic network connectivity"
+    ]
+  },
+  {
+    "id": "R003",
+    "category": "Connectivity",
+    "symptom": "Intermittent network connection drops on a wired connection",
+    "conditions": [
+      "Ping tests show packet loss and high latency sporadically",
+      "Network link lights flicker erratically on the NIC or switch port",
+      "Errors reported in `dmesg` or `ip -s link show eth0` (e.g., 'rx_errors', 'tx_errors')"
+    ],
+    "diagnosis": "Faulty Ethernet cable, loose connection, or failing network adapter/port",
+    "solution": [
+      "Replace the Ethernet cable with a known good one",
+      "Try a different port on the network switch/router",
+      "Reseat the network adapter card in the workstation's PCI slot (if applicable)",
+      "Update or reinstall the network adapter drivers",
+      "Check for electromagnetic interference (EMI) sources near the cable run",
+      "Inspect the cable and connectors for physical damage"
+    ]
+  },
+  {
+    "id": "R004",
+    "category": "Connectivity",
+    "symptom": "Cannot access specific internal server by IP address or hostname",
+    "conditions": [
+      "Ping to the server's IP address fails",
+      "Other devices on the same subnet can access the server",
+      "Firewall on the client workstation is temporarily disabled for testing"
+    ],
+    "diagnosis": "Incorrect subnet configuration, VLAN mismatch, or routing issue",
+    "solution": [
+      "Verify the workstation's IP address, subnet mask, and default gateway (`ip a`, `ip route`)",
+      "Check the server's IP configuration to ensure it's on the expected subnet",
+      "Examine the routing table on the workstation (`ip route show`) for specific routes to the server's network",
+      "Confirm there are no VLAN mismatches on the switch ports connecting the workstation and the server",
+      "Perform a `traceroute` or `tracert` to the server to identify where connectivity breaks down",
+      "Check switch port configuration (e.g., VLAN assignments, port security) for the server and client"
+    ]
+  },
+  {
+    "id": "R005",
+    "category": "Connectivity",
+    "symptom": "Wireless network connection is unstable or drops frequently",
+    "conditions": [
+      "Signal strength is reported as low or fluctuating by the wireless adapter",
+      "Packet loss observed during continuous ping tests to the wireless router",
+      "Other wireless devices experience similar issues on the same network"
+    ],
+    "diagnosis": "Poor signal strength, interference, or faulty wireless access point/router",
+    "solution": [
+      "Relocate the wireless router/access point to a more central location or closer to the devices",
+      "Change the wireless channel on the router to avoid interference from neighboring networks (`iwlist scan` to identify occupied channels)",
+      "Update the firmware of the wireless router/access point",
+      "Update or reinstall the wireless adapter drivers on the affected devices",
+      "Check for physical obstructions (walls, metal objects) that might block the signal",
+      "Consider upgrading to a newer wireless standard (e.g., Wi-Fi 6) or adding more access points for better coverage"
+    ]
+  },
+  {
+    "id": "R006",
+    "category": "Connectivity",
+    "symptom": "Newly added device cannot connect to the network (wired)",
+    "conditions": [
+      "Device does not obtain an IP address via DHCP or configured static IP does not work",
+      "Link light on the switch port or device NIC is off or flashes intermittently",
+      "No MAC address entry for the device is seen in the switch's MAC address table (`show mac address-table`)"
+    ],
+    "diagnosis": "Faulty cable, incorrect switch port configuration, or dead network adapter on the new device",
+    "solution": [
+      "Verify the Ethernet cable is functional and correctly connected on both ends",
+      "Try a different port on the network switch that is known to be operational",
+      "Check the switch port configuration (e.g., port status, VLAN assignment, port security) to ensure it's active and correct",
+      "Inspect the network adapter on the new device for physical damage or signs of failure",
+      "Ensure the new device's network adapter drivers are installed and up to date (if applicable)",
+      "If using static IP, double-check the IP, subnet mask, and gateway configuration on the new device"
+    ]
+  },
+  {
+    "id": "R007",
+    "category": "Connectivity",
+    "symptom": "Cannot access network shares on a Windows server",
+    "conditions": [
+      "Ping to the Windows server's IP address is successful",
+      "Server can access other network resources",
+      "Error message 'Network path not found' or 'Access Denied'"
+    ],
+    "diagnosis": "Firewall blocking SMB/CIFS ports, incorrect share permissions, or server service issues",
+    "solution": [
+      "Verify the server's firewall (Windows Firewall or third-party) is not blocking SMB ports (445, 139)",
+      "Check the share permissions on the Windows server to ensure the user has appropriate access",
+      "Ensure the 'Server' and 'Workstation' services are running on the Windows server",
+      "Verify that network discovery and file sharing are enabled on the server's network profile",
+      "Attempt to access the share using the server's IP address instead of hostname (e.g., `\\\\192.168.1.100\\sharename`)",
+      "Check event logs on the server for errors related to SMB or authentication"
+    ]
+  },
+  {
+    "id": "R008",
+    "category": "Connectivity",
+    "symptom": "Multiple users report slow network access to a specific server application",
+    "conditions": [
+      "Ping latency to the server is consistently high from multiple clients",
+      "Server's CPU or memory utilization is reported as high",
+      "`netstat -an | grep :<app_port>` shows many connections in `TIME_WAIT` or `CLOSE_WAIT` state"
+    ],
+    "diagnosis": "Server overload, network congestion, or application-specific issues",
+    "solution": [
+      "Monitor the server's resource utilization (CPU, RAM, disk I/O) to check for bottlenecks",
+      "Use `iperf` or `nuttcp` to test network bandwidth between clients and the server",
+      "Examine network device (switch, router) logs for interface errors or high utilization on ports connected to the server",
+      "Review the application's logs for performance warnings or errors",
+      "Optimize the application configuration or database queries if it's application-bound",
+      "Consider upgrading server hardware or scaling out the application infrastructure"
+    ]
+  },
+  {
+    "id": "R009",
+    "category": "Connectivity",
+    "symptom": "Guest Wi-Fi network is not broadcasting or clients cannot connect",
+    "conditions": [
+      "SSID for guest network is not visible in wireless scans",
+      "Clients receive authentication errors when attempting to connect to the guest SSID",
+      "WLAN controller or access point logs show errors related to guest network provisioning"
+    ],
+    "diagnosis": "Guest network disabled, incorrect security settings, or VLAN/routing misconfiguration",
+    "solution": [
+      "Verify that the guest Wi-Fi network is enabled and configured correctly on the access point/controller",
+      "Double-check the security settings (SSID, password, authentication method) for the guest network",
+      "Ensure the VLAN assigned to the guest network is correctly tagged on switch ports and routed on the firewall/router",
+      "Check DHCP scope for the guest network to ensure IP addresses are being assigned",
+      "Restart the access point(s) or wireless controller",
+      "Review the firewall rules that might be blocking DHCP or DNS traffic for the guest network"
+    ]
+  },
+  {
+    "id": "R010",
+    "category": "Connectivity",
+    "symptom": "Devices in one VLAN cannot communicate with devices in another VLAN",
+    "conditions": [
+      "Ping fails between devices in different VLANs, but succeeds within the same VLAN",
+      "Router's interface for inter-VLAN routing shows 'DOWN' or incorrect IP configuration",
+      "Switch port modes (access/trunk) and native VLAN settings are mismatched"
+    ],
+    "diagnosis": "Inter-VLAN routing misconfiguration, VLAN tagging issues, or firewall rules blocking traffic",
+    "solution": [
+      "Verify the router's sub-interfaces or routed interfaces are configured correctly with the appropriate VLAN IDs and IP addresses",
+      "Ensure switch ports connecting to the router are configured as trunk ports and allowing the necessary VLANs",
+      "Check that devices in each VLAN have the correct default gateway configured (the router's IP for their VLAN)",
+      "Examine firewall rules on the router or firewall appliance that might be blocking inter-VLAN traffic",
+      "Use `traceroute` to identify where the traffic is being dropped between VLANs",
+      "Review `show interface trunk` and `show vlan` commands on switches for correct VLAN assignments"
+    ]
+  },
+  {
+    "id": "R011",
+    "category": "Connectivity",
+    "symptom": "Specific web application not loading or showing 'Connection Refused' error",
+    "conditions": [
+      "Ping to the web server is successful",
+      "Access to other applications or services on the same server works",
+      "Browser shows specific error messages like 'Connection Refused' or 'ERR_CONNECTION_REFUSED'"
+    ],
+    "diagnosis": "Application not running, web server misconfiguration, or application-level firewalling",
+    "solution": [
+      "Verify the web application service (e.g., Apache, Nginx, IIS) is running on the server",
+      "Check the web server configuration files for correct port listening and virtual host settings",
+      "Examine any application-level firewalls or security groups on the server that might be blocking access to the application's port",
+      "Inspect the web server access and error logs for specific application errors",
+      "Use `telnet <server_ip> <app_port>` to test if the port is open and listening",
+      "Restart the web application service or the entire web server"
+    ]
+  },
+  {
+    "id": "R012",
+    "category": "Connectivity",
+    "symptom": "New router installed, but devices cannot get internet access",
+    "conditions": [
+      "Devices obtain IP addresses from the new router's DHCP server",
+      "Ping to the router's IP address is successful, but ping to external IPs (e.g., 8.8.8.8) fails",
+      "Router's WAN interface status shows 'Disconnected' or no IP from ISP"
+    ],
+    "diagnosis": "WAN connection issue, ISP configuration, or router's NAT/routing misconfiguration",
+    "solution": [
+      "Verify the WAN cable is securely connected to the router and the ISP modem/ONT",
+      "Power cycle the ISP modem/ONT and then the new router",
+      "Check the router's WAN configuration for correct connection type (DHCP, PPPoE, Static IP) and credentials (if applicable)",
+      "Confirm that the router's internal routing table and NAT settings are correctly configured",
+      "Contact the ISP to verify their service is active and there are no issues on their end",
+      "Check the router's firewall settings to ensure it's not blocking outbound internet access"
+    ]
+  },
+  {
+    "id": "R013",
+    "category": "Connectivity",
+    "symptom": "Remote users cannot access internal resources via site-to-site VPN",
+    "conditions": [
+      "VPN tunnel status on both ends shows 'UP' or 'Connected'",
+      "Ping from remote network to internal network devices fails",
+      "Traffic logs on the firewall/router show packets being dropped or denied over the VPN tunnel"
+    ],
+    "diagnosis": "Incorrect VPN routing, firewall rules, or mismatched encryption settings",
+    "solution": [
+      "Verify that the correct interesting traffic (networks to be tunneled) is defined on both VPN endpoints",
+      "Check routing tables on both VPN endpoints to ensure routes exist for the remote network through the tunnel interface",
+      "Examine firewall rules on both ends to ensure traffic is permitted to pass through the VPN tunnel",
+      "Confirm that VPN encryption, authentication, and phase 1/2 settings match exactly on both endpoints",
+      "Review VPN logs for specific errors or reasons for traffic drops",
+      "Perform a packet capture on both ends of the VPN tunnel to see if traffic is entering and exiting as expected"
+    ]
+  },
+  {
+    "id": "R014",
+    "category": "Connectivity",
+    "symptom": "VoIP phones are not registering or making calls",
+    "conditions": [
+      "VoIP phone displays 'Registering' or 'Network Error'",
+      "No IP address obtained by the phone or incorrect VLAN assigned",
+      "SIP server or call manager cannot be reached by the phone (`ping <sip_server_ip>` fails)"
+    ],
+    "diagnosis": "Network connectivity issues, VLAN misconfiguration, or missing VoIP QoS settings",
+    "solution": [
+      "Verify network connectivity from the phone to the SIP server/call manager (ping, traceroute)",
+      "Ensure the correct VLAN is assigned to the switch port connected to the VoIP phone (if using voice VLANs)",
+      "Check DHCP scope options (e.g., Option 66 for TFTP server) are correctly configured for VoIP phones",
+      "Ensure QoS (Quality of Service) is enabled and configured on switches and routers to prioritize VoIP traffic",
+      "Verify that firewall rules are not blocking SIP (UDP 5060) or RTP (UDP 10000-20000) ports",
+      "Restart the VoIP phone and check its configuration for correct server IP and credentials"
+    ]
+  },
+  {
+    "id": "R015",
+    "category": "Connectivity",
+    "symptom": "Remote desktop (RDP) connections fail to a server",
+    "conditions": [
+      "Ping to the server is successful, but RDP connection attempts time out or fail",
+      "Server is listening on RDP port (3389) according to `netstat -an | grep 3389` on the server",
+      "Other services on the server are accessible (e.g., ping, HTTP)"
+    ],
+    "diagnosis": "Server's firewall blocking RDP, RDP service not running, or network access control lists (ACLs)",
+    "solution": [
+      "Check the Windows Firewall or third-party firewall on the server to ensure RDP port 3389 is allowed for inbound connections",
+      "Verify that the Remote Desktop Services service is running on the server",
+      "Ensure that users attempting to connect are part of the 'Remote Desktop Users' group on the server",
+      "Check network access control lists (ACLs) on routers or switches in the path that might be blocking RDP traffic",
+      "Attempt to connect from a different client or network segment to isolate the issue",
+      "Review the server's event logs for RDP-related errors or security events"
+    ]
+  },
+  {
+    "id": "R016",
+    "category": "Connectivity",
+    "symptom": "Network printer is offline or inaccessible from workstations",
+    "conditions": [
+      "Ping to the printer's IP address fails from client workstations",
+      "Printer's control panel shows 'Offline' or 'Network Error'",
+      "Other network devices on the same subnet as the printer are accessible"
+    ],
+    "diagnosis": "Printer network configuration issue, faulty cable, or network connectivity loss to the printer",
+    "solution": [
+      "Power cycle the printer and allow it to re-acquire an IP address (if DHCP)",
+      "Verify the Ethernet cable is securely connected to the printer and the network switch",
+      "Check the printer's network settings (IP address, subnet mask, default gateway) via its control panel or web interface",
+      "Ensure the switch port connected to the printer is active and configured correctly (e.g., same VLAN as workstations)",
+      "If a print server is used, verify the print server is online and its services are running",
+      "Try assigning a static IP address to the printer to rule out DHCP issues"
+    ]
+  },
+  {
+    "id": "R017",
+    "category": "Connectivity",
+    "symptom": "Client device cannot reach default gateway after reboot",
+    "conditions": [
+      "Workstation's IP address is correct but `ping <default_gateway_ip>` fails",
+      "ARP cache on the workstation does not show the gateway's MAC address (`arp -a`)",
+      "Switch port connected to the workstation is active, but no traffic is passing"
+    ],
+    "diagnosis": "ARP cache issue, faulty switch port, or gateway device issue",
+    "solution": [
+      "Clear the ARP cache on the workstation (`arp -d *` on Windows, `ip -s -s neigh flush all` on Linux)",
+      "Try a different switch port for the workstation's connection",
+      "Power cycle the default gateway (router/Layer 3 switch)",
+      "Verify the default gateway device is operational and its interface connecting to the workstation's subnet is up",
+      "Check for duplicate IP addresses on the network for the default gateway IP",
+      "Perform a packet capture on the workstation to see if ARP requests for the gateway are being sent and replied to"
+    ]
+  },
+  {
+    "id": "R018",
+    "category": "Connectivity",
+    "symptom": "Internet access is working, but some websites are unreachable or slow to load",
+    "conditions": [
+      "Ping to 8.8.8.8 is successful, but `ping <unreachable_website>` fails or times out",
+      "`traceroute` to the unreachable website times out at a specific hop outside the local network",
+      "DNS resolution for the website is successful (`nslookup <website>`), but connection to the IP fails"
+    ],
+    "diagnosis": "ISP routing issue, specific website server issue, or external firewall blocking",
+    "solution": [
+      "Test connectivity to other external websites to confirm it's not a general internet outage",
+      "Use `traceroute` to the problematic website to identify where the connection breaks down (often indicates ISP issue or destination server issue)",
+      "Check the status of the problematic website using online tools (e.g., 'Is It Down Right Now?')",
+      "Clear browser cache and DNS cache on the client workstation",
+      "Temporarily change DNS servers to public ones (e.g., 8.8.8.8, 1.1.1.1) to rule out DNS issues",
+      "Contact your ISP if `traceroute` indicates issues on their network"
+    ]
+  },
+  {
+    "id": "R019",
+    "category": "Connectivity",
+    "symptom": "Network Time Protocol (NTP) synchronization fails for network devices",
+    "conditions": [
+      "Devices show incorrect time or time drift when compared to a known accurate source",
+      "`ntpq -p` or `ntpstat` on Linux devices show 'unreachable' or 'no server' status",
+      "Firewall logs indicate traffic to NTP port (UDP 123) is being blocked"
+    ],
+    "diagnosis": "NTP server not reachable, firewall blocking NTP, or incorrect NTP server configuration",
+    "solution": [
+      "Verify the NTP server IP address and connectivity (`ping <ntp_server_ip>`)",
+      "Ensure firewall rules allow outbound UDP port 123 traffic from devices to the NTP server and inbound replies",
+      "Check the NTP server daemon status (e.g., `systemctl status ntp` or `chronyd`) on the server itself",
+      "Ensure the NTP client configuration on network devices points to the correct NTP server(s)",
+      "If using internal NTP server, verify it's synchronizing correctly with external sources",
+      "Restart the NTP client service on the affected devices"
+    ]
+  },
+  {
+    "id": "R020",
+    "category": "Connectivity",
+    "symptom": "New network segment (subnet) cannot reach existing network segments",
+    "conditions": [
+      "Devices in the new segment can communicate within their own segment but not across to old segments",
+      "Routing table on the main router or Layer 3 switch does not show routes to the new segment",
+      "ACLs or firewall rules on the router are not updated to permit traffic between segments"
+    ],
+    "diagnosis": "Missing routing configuration, incorrect subnet mask, or unconfigured firewall rules",
+    "solution": [
+      "Add static routes to the main router or Layer 3 switch for the new network segment, pointing to its gateway",
+      "If using dynamic routing protocols (OSPF, EIGRP), ensure the new segment is advertised or redistributed correctly",
+      "Verify that the subnet mask and network addresses are correctly configured on all interfaces and routing entries",
+      "Update any firewall rules or ACLs on the router to allow traffic flow between the new and existing segments",
+      "Perform a `traceroute` from a device in the new segment to a device in an old segment to pinpoint the routing failure",
+      "Check for any overlapping IP address ranges between the new and existing segments"
+    ]
+  }
+]

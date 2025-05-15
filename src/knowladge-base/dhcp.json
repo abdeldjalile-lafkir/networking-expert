@@ -1,0 +1,382 @@
+[
+  {
+    "id": "R081",
+    "category": "DHCP",
+    "symptom": "Workstation fails to obtain an IP address (APIPA or no IP)",
+    "conditions": [
+      "Workstation has an IP address in the 169.254.0.0/16 range (APIPA) or no IP address at all (`ip a` or `ipconfig /all`)",
+      "Error message 'No DHCP server found' or 'DHCP request failed' in client logs",
+      "DHCP client service on the workstation is running"
+    ],
+    "diagnosis": "DHCP server unreachable, no DHCP lease available, or network connectivity issue to DHCP server",
+    "solution": [
+      "Verify the DHCP server is running and accessible on the network (`ping <dhcp_server_ip>` from a device that can reach it)",
+      "Check the network connectivity between the workstation and the DHCP server (e.g., physical cable, switch port, VLAN configuration)",
+      "Renew the DHCP lease on the workstation (`dhclient -r && dhclient` on Linux, `ipconfig /release && ipconfig /renew` on Windows)",
+      "Check the DHCP server logs for any errors related to IP address assignment or lease exhaustion",
+      "Ensure the DHCP scope has available IP addresses and the correct subnet mask",
+      "If using DHCP relay, verify the relay agent is correctly configured on the router/switch and forwarding requests"
+    ]
+  },
+  {
+    "id": "R082",
+    "category": "DHCP",
+    "symptom": "Client receives an incorrect IP address from DHCP",
+    "conditions": [
+      "Workstation obtains an IP address outside the expected subnet range or a duplicate IP address",
+      "Multiple DHCP servers are detected on the network (e.g., rogue DHCP server)",
+      "DHCP server logs show IP address conflicts"
+    ],
+    "diagnosis": "Rogue DHCP server, misconfigured DHCP scope, or IP address conflict",
+    "solution": [
+      "Identify and shut down any unauthorized or rogue DHCP servers on the network (e.g., using `netsh dhcp show server` or network sniffers)",
+      "Verify the DHCP scope configuration on the legitimate DHCP server (IP range, subnet mask, default gateway, DNS servers)",
+      "Check for IP address conflicts using `arp -a` on the client or network scanning tools to find duplicate IPs",
+      "Ensure DHCP reservations or exclusions are not conflicting with the assigned IP address",
+      "Clear the ARP cache on the default gateway and the DHCP server",
+      "Implement DHCP snooping on network switches to prevent rogue DHCP servers"
+    ]
+  },
+  {
+    "id": "R083",
+    "category": "DHCP",
+    "symptom": "DHCP clients are not getting DNS server information",
+    "conditions": [
+      "Workstation obtains an IP address and default gateway, but no DNS servers (`ipconfig /all` or `cat /etc/resolv.conf`)",
+      "DNS server options (Option 6) are not configured in the DHCP scope",
+      "DHCP server logs show successful IP lease but no DNS server assignment"
+    ],
+    "diagnosis": "Missing DNS server option in DHCP scope, or incorrect DNS server IP configured in scope",
+    "solution": [
+      "Configure DHCP Option 6 (DNS Servers) in the DHCP scope with the correct IP addresses of your DNS servers",
+      "Restart the DHCP server service after making configuration changes",
+      "Renew the DHCP lease on the affected clients (`dhclient -r && dhclient` or `ipconfig /release && ipconfig /renew`)",
+      "Verify that the DNS server IPs entered in the DHCP scope are reachable and operational",
+      "Check for any other DHCP options (e.g., Option 15 Domain Name) that might be misconfigured and affecting DNS",
+      "Ensure there are no overriding DHCP policies or filters that might remove DNS information"
+    ]
+  },
+  {
+    "id": "R084",
+    "category": "DHCP",
+    "symptom": "DHCP server is not responding to client requests (DHCPDiscover not replied)",
+    "conditions": [
+      "Packet capture shows DHCPDiscover packets from client but no DHCPOffer from server",
+      "DHCP server service is running, but logs show no incoming requests",
+      "Firewall on DHCP server or network is blocking UDP ports 67/68"
+    ],
+    "diagnosis": "Firewall blocking DHCP, network connectivity issue, or DHCP server binding issue",
+    "solution": [
+      "Check the firewall on the DHCP server (and any network firewalls in between) to ensure UDP ports 67 and 68 are open for DHCP traffic",
+      "Verify that the DHCP server is configured to listen on the correct network interface(s)",
+      "Ensure the DHCP server's IP address is on the same subnet as the clients (or that a DHCP relay agent is configured)",
+      "Restart the DHCP server service",
+      "Check the DHCP server event logs for any binding errors or service startup failures",
+      "Confirm no other application is binding to UDP port 67 on the DHCP server"
+    ]
+  },
+  {
+    "id": "R085",
+    "category": "DHCP",
+    "symptom": "DHCP leases are expiring prematurely or not being renewed",
+    "conditions": [
+      "Clients lose IP connectivity frequently, and their lease times are very short",
+      "DHCP server logs show 'lease expired' or 'lease not renewed' for active clients",
+      "Clients are not sending DHCPRequest packets before their leases expire"
+    ],
+    "diagnosis": "Short DHCP lease duration, client not renewing lease, or network instability",
+    "solution": [
+      "Increase the DHCP lease duration in the DHCP scope to a more appropriate value (e.g., 8 days for wired networks)",
+      "Ensure the DHCP client service on the workstations is functioning correctly and attempting to renew leases at the appropriate time (e.g., 50% of lease time)",
+      "Check for network instability or connectivity issues between the client and DHCP server that might prevent renewal requests",
+      "Review the DHCP server's available IP pool; if exhausted, clients might not get renewals",
+      "Verify that the DHCP server's clock is synchronized with NTP to avoid time-related lease issues",
+      "Clear any persistent DHCP lease information on the client and force a full new lease acquisition"
+    ]
+  },
+  {
+    "id": "R086",
+    "category": "DHCP",
+    "symptom": "DHCP relay agent is not forwarding requests to the DHCP server",
+    "conditions": [
+      "Clients on a remote subnet served by a relay agent fail to obtain IP addresses",
+      "Packet capture on the relay agent shows DHCPDiscover packets but no forwarded requests to the DHCP server",
+      "Relay agent configuration on the router/Layer 3 switch is incorrect or missing"
+    ],
+    "diagnosis": "Incorrect DHCP relay configuration, firewall blocking relay traffic, or routing issue",
+    "solution": [
+      "Verify the DHCP relay agent configuration on the router/Layer 3 switch (e.g., `ip helper-address <dhcp_server_ip>` on Cisco)",
+      "Ensure the DHCP server's IP address is correctly entered as the helper address",
+      "Check firewall rules on the relay agent device or any intermediate firewalls that might be blocking UDP 67/68 traffic from being forwarded",
+      "Verify that routing is correctly configured between the relay agent's interface and the DHCP server's network",
+      "Ensure the relay agent's interface is active and correctly assigned to the client's VLAN/subnet",
+      "Review relay agent logs or debug output for any errors or forwarding failures"
+    ]
+  },
+  {
+    "id": "R087",
+    "category": "DHCP",
+    "symptom": "DHCP server logs show 'Scope Exhausted' or 'No More Addresses'",
+    "conditions": [
+      "New clients fail to obtain IP addresses, or existing clients cannot renew their leases",
+      "DHCP server monitoring shows the current IP address usage near 100%",
+      "Large number of inactive or expired leases are still present in the DHCP server lease table"
+    ],
+    "diagnosis": "Insufficient IP address pool size, very short lease times, or unreleased static IPs",
+    "solution": [
+      "Increase the size of the IP address pool in the DHCP scope to accommodate more clients",
+      "Review the DHCP lease duration and consider increasing it if it's excessively short",
+      "Manually reconcile and remove expired or inactive leases from the DHCP server to free up addresses",
+      "Check for devices configured with static IP addresses that fall within the DHCP scope, causing conflicts and consuming addresses",
+      "Implement DHCP snooping on switches to prevent unauthorized devices from obtaining leases",
+      "Consider network segmentation or adding more DHCP scopes/servers to manage IP address allocation"
+    ]
+  },
+  {
+    "id": "R088",
+    "category": "DHCP",
+    "symptom": "Clients with static IP configurations are experiencing IP conflicts",
+    "conditions": [
+      "Workstation with a manually configured static IP address reports 'Duplicate IP Address Detected'",
+      "DHCP server logs show the static IP address being offered or assigned to another DHCP client",
+      "DHCP scope includes the range of statically assigned IP addresses"
+    ],
+    "diagnosis": "Static IP within DHCP scope, or DHCP reservation conflict",
+    "solution": [
+      "Configure an exclusion range in the DHCP scope for all statically assigned IP addresses to prevent DHCP from assigning them",
+      "If DHCP reservations are used, ensure the reservation matches the exact MAC address of the device with the static IP",
+      "Verify that the device with the static IP address is not configured to also use DHCP",
+      "Perform an ARP scan on the network to identify all devices using the conflicting IP address",
+      "Educate users or implement network access control (NAC) to prevent unauthorized static IP assignments",
+      "Clear the ARP cache on the affected devices and network devices to resolve temporary conflicts"
+    ]
+  },
+  {
+    "id": "R089",
+    "category": "DHCP",
+    "symptom": "DHCP Option 66 (TFTP server) not being delivered to VoIP phones",
+    "conditions": [
+      "VoIP phones fail to register or obtain configuration files from the TFTP server",
+      "DHCP server logs show IP addresses assigned, but Option 66 is missing from the offer",
+      "Packet capture shows DHCPOffer without Option 66 in the DHCP options field"
+    ],
+    "diagnosis": "Option 66 not configured in DHCP scope, or incorrect value configured",
+    "solution": [
+      "Ensure DHCP Option 66 (Boot Server Host Name or TFTP Server Name) is configured in the DHCP scope with the correct IP address of the TFTP server",
+      "Verify the TFTP server is running and the configuration files are accessible",
+      "Check for any other DHCP options or vendor-specific options that might be conflicting with or overriding Option 66",
+      "Restart the DHCP server service after configuration changes",
+      "Force a DHCP lease renewal on the VoIP phones",
+      "Ensure the TFTP server is reachable from the VoIP phone's network segment"
+    ]
+  },
+  {
+    "id": "R090",
+    "category": "DHCP",
+    "symptom": "Wireless clients randomly lose IP addresses or connect with APIPA",
+    "conditions": [
+      "Wireless clients report 'Limited or No Connectivity' or acquire a 169.254.x.x address intermittently",
+      "DHCP server shows successful lease assignments, but clients disconnect frequently",
+      "Wireless access point logs show client disconnections or authentication issues"
+    ],
+    "diagnosis": "Wireless signal instability, DHCP server overload, or AP blocking DHCP traffic",
+    "solution": [
+      "Check wireless signal strength and interference issues (channel congestion, neighboring APs) on the wireless access points",
+      "Ensure the wireless access points are not blocking DHCP broadcasts or filtering client MAC addresses",
+      "Verify the DHCP server's capacity and performance, especially during peak wireless client connections",
+      "Update firmware on wireless access points and wireless adapter drivers on clients",
+      "Consider increasing the DHCP lease time for wireless clients to reduce renewal frequency",
+      "If using VLANs, ensure the correct VLAN ID is associated with the wireless SSID and forwarded to the correct DHCP scope"
+    ]
+  },
+  {
+    "id": "R091",
+    "category": "DHCP",
+    "symptom": "DHCP server service fails to start on Windows Server",
+    "conditions": [
+      "Event Viewer shows errors related to DHCP Server service startup failure (e.g., Event ID 1004, 1006)",
+      "`net start DHCPServer` command returns 'Access is denied' or 'Service did not respond'",
+      "No IP address scopes are loaded when inspecting the DHCP console"
+    ],
+    "diagnosis": "Missing permissions, corrupted database, or conflicting service",
+    "solution": [
+      "Ensure the account running the DHCP server service has appropriate permissions (e.g., Local System or Network Service)",
+      "Check for conflicting services or applications binding to UDP port 67 (e.g., another DHCP server, network monitoring tool)",
+      "Repair the DHCP database using `netsh dhcp server backup` and `restore` commands, or delete and recreate it (as a last resort)",
+      "Check the server's system event logs for more detailed errors related to service startup failures",
+      "Verify the disk where the DHCP database is stored has sufficient free space and no corruption",
+      "Temporarily disable antivirus software during troubleshooting to rule out interference"
+    ]
+  },
+  {
+    "id": "R092",
+    "category": "DHCP",
+    "symptom": "DHCP snooping is blocking legitimate DHCP traffic on switches",
+    "conditions": [
+      "Clients connected to a switch with DHCP snooping enabled fail to obtain IP addresses",
+      "Switch logs show 'DHCP snooping violation' or 'DHCP snooping discard' messages for client ports",
+      "Legitimate DHCP server is connected to an untrusted port or not configured as a trusted source"
+    ],
+    "diagnosis": "Incorrect DHCP snooping configuration (trusted ports, untrusted ports, or rate limits)",
+    "solution": [
+      "Configure the switch port connected to the legitimate DHCP server as a 'trusted' port for DHCP snooping",
+      "Ensure all client-facing ports are configured as 'untrusted' ports",
+      "If using DHCP snooping on multiple VLANs, ensure it's enabled for all relevant VLANs",
+      "Adjust DHCP snooping rate limits on untrusted ports if legitimate bursts of DHCP traffic are being dropped",
+      "Review the DHCP snooping database (binding table) on the switch for any anomalies",
+      "Temporarily disable DHCP snooping on the problematic switch to confirm it's the cause, then re-enable and configure correctly"
+    ]
+  },
+  {
+    "id": "R093",
+    "category": "DHCP",
+    "symptom": "DHCP clients are not receiving correct default gateway information",
+    "conditions": [
+      "Clients obtain an IP address but cannot reach devices outside their subnet (e.g., `ping google.com` fails, but `ping <local_ip>` succeeds)",
+      "Default gateway option (Option 3) in DHCP scope is missing or incorrect",
+      "`ip route show` on Linux or `ipconfig /all` on Windows shows no default gateway or an incorrect one"
+    ],
+    "diagnosis": "Missing DHCP Option 3, incorrect default gateway IP in scope, or routing issue after DHCP",
+    "solution": [
+      "Ensure DHCP Option 3 (Router/Default Gateway) is configured in the DHCP scope with the correct IP address of the default gateway for that subnet",
+      "Verify the default gateway's IP address is correct and that the router interface is up and reachable",
+      "Restart the DHCP server service after making configuration changes",
+      "Renew the DHCP lease on the affected clients to pick up the updated gateway information",
+      "Check for any network ACLs or firewalls that might be blocking gateway reachability even after DHCP assignment",
+      "Ensure clients do not have a static default gateway configured that is overriding DHCP"
+    ]
+  },
+  {
+    "id": "R094",
+    "category": "DHCP",
+    "symptom": "DHCP server fails to assign IP addresses to PXE boot clients",
+    "conditions": [
+      "PXE boot clients display 'No boot filename received' or 'PXE-E53: No boot filename received'",
+      "DHCP server logs show requests from PXE clients but no filename (Option 67) or boot server (Option 66) in the offer",
+      "Firewall on DHCP server is blocking TFTP (UDP port 69)"
+    ],
+    "diagnosis": "Missing PXE boot options (66/67), incorrect TFTP server/filename, or firewall blocking TFTP",
+    "solution": [
+      "Configure DHCP Option 66 (Boot Server Host Name) with the IP address of your TFTP server",
+      "Configure DHCP Option 67 (Bootfile Name) with the exact filename of your PXE boot loader (e.g., `pxelinux.0`)",
+      "Ensure the TFTP server is running and accessible on the network, and the boot file exists in the correct directory",
+      "Check the firewall on the DHCP server and TFTP server to ensure UDP port 69 (TFTP) is open",
+      "Verify that the PXE boot client is in the correct VLAN and DHCP scope that has these options configured",
+      "Restart the DHCP server service after making configuration changes for PXE options"
+    ]
+  },
+  {
+    "id": "R095",
+    "category": "DHCP",
+    "symptom": "DHCP server is suffering from high CPU utilization due to excessive requests",
+    "conditions": [
+      "Monitoring tools show DHCP server CPU usage consistently above 80-90%",
+      "DHCP server logs show a very high rate of DHCPDiscover/Request messages",
+      "Network packet capture reveals a high volume of broadcast DHCP traffic"
+    ],
+    "diagnosis": "Rogue DHCP clients, short lease times, or DHCP server under attack",
+    "solution": [
+      "Identify and resolve any rogue DHCP clients that might be constantly requesting leases (e.g., misbehaving network devices, loopback issues)",
+      "Increase the DHCP lease duration to reduce the frequency of renewal requests",
+      "Segment the network to reduce broadcast domains and distribute DHCP load across multiple servers or relay agents",
+      "Implement DHCP snooping and ARP inspection on switches to mitigate DHCP starvation attacks",
+      "Consider increasing the hardware resources (CPU, RAM) of the DHCP server",
+      "Review DHCP server logs for unusual activity or patterns that might indicate a DoS attack"
+    ]
+  },
+  {
+    "id": "R096",
+    "category": "DHCP",
+    "symptom": "DHCP reservations are not being honored for specific devices",
+    "conditions": [
+      "Device with a configured DHCP reservation obtains a different IP address from the DHCP scope",
+      "DHCP server logs show the MAC address associated with the reservation receiving a different IP",
+      "Multiple DHCP reservations exist for the same MAC address but different IPs, or vice-versa"
+    ],
+    "diagnosis": "Incorrect MAC address in reservation, duplicate reservation, or network issue causing reservation bypass",
+    "solution": [
+      "Double-check the MAC address entered in the DHCP reservation to ensure it exactly matches the device's MAC address",
+      "Verify there are no duplicate DHCP reservations for the same MAC address or IP address in the DHCP scope",
+      "Ensure the reserved IP address is within the DHCP scope but not part of an exclusion range (unless explicitly desired)",
+      "Delete and recreate the DHCP reservation on the server to ensure it's correctly applied",
+      "Clear the DHCP client's lease and force a new lease acquisition to pick up the reservation",
+      "Check for network issues (e.g., switch port security, spanning tree issues) that might be interfering with the DHCP process"
+    ]
+  },
+  {
+    "id": "R097",
+    "category": "DHCP",
+    "symptom": "DHCP server cannot find the correct scope for a client request",
+    "conditions": [
+      "Clients from a specific subnet fail to get an IP address, despite the subnet having a configured DHCP scope",
+      "DHCP server logs show 'no active scope found' or 'no available addresses for this subnet'",
+      "DHCP relay agent is correctly configured, but the server doesn't respond"
+    ],
+    "diagnosis": "Incorrect DHCP scope configuration (subnet, range), or relay agent IP not recognized by server",
+    "solution": [
+      "Verify that the DHCP scope's network address and subnet mask exactly match the client's subnet where the request originates",
+      "If using a DHCP relay agent, ensure the `ip helper-address` or equivalent is configured with the DHCP server's IP and that the server has a scope for that relay agent's subnet",
+      "Check for any overlapping DHCP scopes that might be causing confusion for the server",
+      "Ensure the DHCP scope is activated and enabled on the DHCP server",
+      "Review the DHCP server's binding properties to ensure it's listening on the correct interfaces",
+      "Check routing between the DHCP server and the client's network segment, especially if the DHCP server is on a different subnet"
+    ]
+  },
+  {
+    "id": "R098",
+    "category": "DHCP",
+    "symptom": "DHCP server not assigning IPv6 addresses (DHCPv6)",
+    "conditions": [
+      "Clients are configured for DHCPv6 but only receive a link-local IPv6 address or no IPv6 address",
+      "DHCPv6 server logs show no incoming solicit messages or no replies",
+      "IPv6 routing and connectivity are confirmed to be working on the network"
+    ],
+    "diagnosis": "DHCPv6 server misconfiguration, firewall blocking DHCPv6 ports, or client not using DHCPv6 (SLAAC instead)",
+    "solution": [
+      "Verify the DHCPv6 server is installed, running, and has configured IPv6 scopes/pools",
+      "Ensure the DHCPv6 server is configured to listen on the correct IPv6 interfaces",
+      "Check firewall rules to ensure UDP ports 546 (client) and 547 (server) are open for DHCPv6 traffic",
+      "Verify that clients are configured to use DHCPv6 for address assignment and not just SLAAC (Stateless Address Autoconfiguration)",
+      "Ensure the router is not sending RAs (Router Advertisements) that override DHCPv6 assignment",
+      "Restart the DHCPv6 server service and renew DHCPv6 leases on clients"
+    ]
+  },
+  {
+    "id": "R099",
+    "category": "DHCP",
+    "symptom": "DHCP client issues on a dual-homed server (multiple NICs)",
+    "conditions": [
+      "Server with multiple network interfaces obtains an IP address on the wrong NIC or no IP at all",
+      "DHCP logs show requests coming from an unexpected interface MAC address",
+      "Network connectivity is only partial or intermittent after DHCP lease acquisition"
+    ],
+    "diagnosis": "Incorrect binding order, multiple NICs requesting DHCP, or network configuration conflicts",
+    "solution": [
+      "Ensure that only the intended network interface is configured to obtain an IP address via DHCP",
+      "Adjust the network adapter binding order (on Windows) or network interface priority (on Linux) to favor the desired NIC for DHCP",
+      "Disable DHCP on secondary network interfaces if they are intended for static IP or specific purposes",
+      "Check for any persistent static IP configurations on the problematic NIC that might be conflicting with DHCP",
+      "Review the DHCP server's lease table for multiple leases associated with the server's MAC addresses",
+      "Consider using DHCP reservations for servers with multiple NICs to ensure consistent IP assignment"
+    ]
+  },
+  {
+    "id": "R100",
+    "category": "DHCP",
+    "symptom": "DHCP server is not providing vendor-specific options (e.g., VoIP, IoT devices)",
+    "conditions": [
+      "Specific types of devices (e.g., VoIP phones, IoT sensors) are not receiving their required configuration options via DHCP",
+      "DHCP server logs show no vendor-specific option delivery despite scopes being configured",
+      "Devices are failing to connect or function properly due to missing configuration"
+    ],
+    "diagnosis": "Incorrect vendor class identifier, missing vendor-specific option definition, or scope misconfiguration",
+    "solution": [
+      "Verify the Vendor Class Identifier (Option 60) on the client device and ensure it matches the configured DHCP server's vendor class definition",
+      "Ensure the vendor-specific options (e.g., Option 43, Option 128-130 for VoIP) are correctly defined and configured in the DHCP scope",
+      "Check that the specific DHCP scope or policy that applies to these devices is correctly configured to deliver the vendor options",
+      "Restart the DHCP server service after making changes to vendor-specific option definitions",
+      "Use a packet capture tool (e.g., Wireshark) to inspect the DHCP offer and verify the presence and correctness of the vendor options",
+      "Consult the device manufacturer's documentation for precise DHCP option requirements and values"
+    ]
+  }
+]

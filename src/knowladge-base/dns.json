@@ -1,0 +1,382 @@
+[
+  {
+    "id": "R041",
+    "category": "DNS",
+    "symptom": "Cannot access websites by name, but can by IP address",
+    "conditions": [
+      "`ping google.com` fails, but `ping 8.8.8.8` succeeds",
+      "`nslookup google.com` returns 'server can't find google.com' or similar error",
+      "Web browser shows 'DNS_PROBE_FINISHED_NXDOMAIN' or 'ERR_NAME_NOT_RESOLVED'"
+    ],
+    "diagnosis": "Incorrect DNS server configuration on the client, DNS server unreachable, or DNS server issues",
+    "solution": [
+      "Verify the DNS server IP addresses configured on the workstation (`/etc/resolv.conf` on Linux, `ipconfig /all` on Windows)",
+      "Ensure the configured DNS servers are reachable (`ping <dns_server_ip>`)",
+      "Flush the DNS resolver cache on the workstation (`ipconfig /flushdns` on Windows, `systemd-resolve --flush-caches` or `sudo killall -HUP mDNSResponder` on macOS)",
+      "Try using public DNS servers (e.g., 8.8.8.8 or 1.1.1.1) temporarily to test resolution",
+      "Restart the DNS Client service on Windows or NetworkManager/systemd-resolved on Linux",
+      "Check firewall rules on the client or network for blocks on UDP port 53 (DNS)"
+    ]
+  },
+  {
+    "id": "R042",
+    "category": "DNS",
+    "symptom": "Internal hostnames are not resolving correctly",
+    "conditions": [
+      "`nslookup <internal_hostname>` fails, but `nslookup <internal_hostname> <internal_dns_server_ip>` succeeds",
+      "Client's DNS suffix search list is not configured or incorrect",
+      "DNS server logs on the internal DNS server do not show queries for the internal hostname"
+    ],
+    "diagnosis": "Incorrect DNS suffix search list, missing DNS records, or Active Directory integration issues",
+    "solution": [
+      "Configure the correct DNS suffix search list on the client (`ipconfig /all` on Windows, `search` line in `/etc/resolv.conf` on Linux)",
+      "Verify that the A or CNAME record for the internal hostname exists and is correct on the internal DNS server",
+      "Ensure the internal DNS server is authoritative for the domain and has the correct forward/reverse lookup zones",
+      "Check if the client is configured to use the internal DNS server as its primary DNS",
+      "For Active Directory environments, ensure DNS is properly integrated and dynamic updates are working",
+      "Restart the DNS server service if recent changes were made and not applied"
+    ]
+  },
+  {
+    "id": "R043",
+    "category": "DNS",
+    "symptom": "Slow DNS resolution resulting in slow website loading",
+    "conditions": [
+      "`dig @<dns_server_ip> <hostname>` shows high query times (e.g., > 500ms)",
+      "DNS server's CPU or memory utilization is consistently high",
+      "Recursive queries on the DNS server are slow to external root hints or forwarders"
+    ],
+    "diagnosis": "Overloaded DNS server, network latency to DNS server, or inefficient DNS server configuration",
+    "solution": [
+      "Ensure the DNS server has adequate hardware resources (CPU, RAM, fast storage)",
+      "Check network latency and packet loss between clients and the DNS server",
+      "Configure DNS server to use reliable and fast forwarders (e.g., ISP's DNS, public DNS like 8.8.8.8)",
+      "Implement DNS caching on local resolvers or clients to reduce repetitive queries",
+      "Optimize DNS server configuration (e.g., enable DNSSEC validation if supported, adjust cache sizes)",
+      "Review DNS server logs for signs of high query load, errors, or denial-of-service attacks"
+    ]
+  },
+  {
+    "id": "R044",
+    "category": "DNS",
+    "symptom": "DNS lookups fail for newly added domain records",
+    "conditions": [
+      "Newly added A/CNAME/MX records are not resolving, but older records are",
+      "`nslookup` from the DNS server itself shows the new records, but clients do not",
+      "Zone transfer issues reported in DNS server logs (if multiple DNS servers)"
+    ],
+    "diagnosis": "DNS cache on clients/intermediate servers, zone replication issues, or incorrect TTL",
+    "solution": [
+      "Flush DNS cache on affected clients and any intermediate DNS servers/forwarders",
+      "Check the TTL (Time-To-Live) value for the newly added records; lower it for faster propagation if needed",
+      "If multiple DNS servers, verify zone transfers (replication) are working correctly between primary and secondary servers",
+      "Ensure the serial number of the DNS zone has been incremented after adding new records",
+      "Force a zone transfer or replication manually if necessary",
+      "Check DNS server event logs for any errors related to zone updates or replication"
+    ]
+  },
+  {
+    "id": "R045",
+    "category": "DNS",
+    "symptom": "Mail delivery issues due to incorrect MX record resolution",
+    "conditions": [
+      "Email clients report 'Host not found' or 'Mail server unreachable' when sending to external domains",
+      "`nslookup -type=MX <domain>` returns incorrect or no MX records",
+      "SMTP server logs show DNS resolution failures for recipient domains"
+    ],
+    "diagnosis": "Incorrect MX record configuration, DNS server issues affecting external lookups, or local DNS cache poisoning",
+    "solution": [
+      "Verify the MX records for the affected domains are correctly configured on your authoritative DNS server (for your domain) or on public DNS (for external domains)",
+      "Ensure your local DNS server can successfully resolve external MX records (check forwarders)",
+      "Clear any DNS cache on your mail server and affected clients",
+      "Check for any misconfigured firewall rules that might be blocking DNS lookups for MX records",
+      "Use an online MX record lookup tool to verify the public facing MX records are correct",
+      "Restart DNS client service on the mail server if it's caching aggressively"
+    ]
+  },
+  {
+    "id": "R046",
+    "category": "DNS",
+    "symptom": "DNS amplification attacks or high DNS query volume",
+    "conditions": [
+      "DNS server shows unusually high outbound traffic on UDP port 53",
+      "ISP reports unusually high DNS traffic originating from your network",
+      "DNS server CPU utilization spikes, and legitimate queries are impacted"
+    ],
+    "diagnosis": "Open DNS resolver, compromised internal host, or DNS reflection/amplification attack",
+    "solution": [
+      "Disable open recursion on your DNS servers, allowing recursion only for trusted internal IPs",
+      "Implement DNS rate limiting (RRL) on your DNS servers to mitigate amplification attacks",
+      "Block outbound UDP 53 traffic from unauthorized internal hosts at the firewall",
+      "Check for compromised internal hosts that might be participating in the attack (`netstat -an` for unusual connections)",
+      "Use DNS sinkholes or blackholes for known malicious domains if traffic is going outbound to them",
+      "Configure your firewalls to drop packets with spoofed source IPs (anti-spoofing measures)"
+    ]
+  },
+  {
+    "id": "R047",
+    "category": "DNS",
+    "symptom": "Specific application cannot resolve its licensing server or update server",
+    "conditions": [
+      "Application fails to start or update, showing 'License server not found' or 'Update failed' errors",
+      "`nslookup <licensing_server_hostname>` from the application's host fails",
+      "Other applications on the same host can resolve external hostnames successfully"
+    ],
+    "diagnosis": "Application-specific DNS configuration, local host file entry, or firewall blocking specific domain",
+    "solution": [
+      "Check the application's specific configuration files or settings for a hardcoded IP or incorrect hostname",
+      "Inspect the local hosts file (`/etc/hosts` on Linux, `C:\\Windows\\System32\\drivers\\etc\\hosts` on Windows) for any conflicting entries",
+      "Verify that the firewall on the application's host or network is not blocking access to the licensing/update server's IP or domain",
+      "Temporarily disable DNS caching for the application if it has its own internal caching mechanism",
+      "Ensure the application's host is using the correct DNS servers for its network segment",
+      "Review the application's logs for more specific DNS or network-related error messages"
+    ]
+  },
+  {
+    "id": "R048",
+    "category": "DNS",
+    "symptom": "Reverse DNS lookups are failing for internal IP addresses",
+    "conditions": [
+      "`nslookup <internal_ip_address>` returns '*** Can't find <ip>: Non-existent domain'",
+      "Reverse lookup zones (PTR records) are missing or misconfigured on the internal DNS server",
+      "Authentication logs or network monitoring tools are showing IP addresses instead of hostnames for internal devices"
+    ],
+    "diagnosis": "Missing or incorrect PTR records, missing reverse lookup zone, or incorrect delegation",
+    "solution": [
+      "Create or verify the existence of the reverse lookup zone (e.g., `1.168.192.in-addr.arpa`) on your DNS server",
+      "Ensure PTR records are created and correct for the internal IP addresses in the reverse lookup zone",
+      "Verify that dynamic DNS updates are configured to update PTR records for DHCP clients",
+      "Check the delegation of the reverse lookup zone to the appropriate DNS servers",
+      "Ensure the DNS client on devices is registering its PTR record (e.g., `ipconfig /registerdns` on Windows)",
+      "Review DNS server event logs for any errors related to PTR record creation or zone updates"
+    ]
+  },
+  {
+    "id": "R049",
+    "category": "DNS",
+    "symptom": "DNS resolution issues after changing ISP or public DNS servers",
+    "conditions": [
+      "After modifying DNS server settings, all external hostname lookups fail or are extremely slow",
+      "New public DNS servers are reachable by `ping`",
+      "ISP support confirms no issues on their end for DNS resolution"
+    ],
+    "diagnosis": "DNS caching, incorrect gateway configuration, or firewall blocking new DNS server IPs",
+    "solution": [
+      "Flush DNS caches on all affected network devices and clients",
+      "Verify that the new DNS server IPs are correctly configured on your router/firewall and DHCP scope",
+      "Ensure your firewall allows outbound UDP/TCP port 53 traffic to the new DNS server IPs",
+      "Power cycle the router/firewall and potentially the local network devices to refresh DHCP leases and DNS settings",
+      "Temporarily revert to old DNS settings or use public DNS (e.g., 8.8.8.8) to isolate the issue",
+      "Check router/firewall logs for any messages related to DNS forwarding or blocking"
+    ]
+  },
+  {
+    "id": "R050",
+    "category": "DNS",
+    "symptom": "Some websites resolve to incorrect IP addresses (DNS poisoning/spoofing)",
+    "conditions": [
+      "Accessing a legitimate website redirects to a malicious site or incorrect content",
+      "`nslookup <legitimate_website>` shows an IP address that is known to be incorrect or malicious",
+      "Antivirus software or network security tools report DNS-related attacks"
+    ],
+    "diagnosis": "DNS cache poisoning, DNS server compromise, or local hosts file compromise",
+    "solution": [
+      "Flush DNS cache on the affected client (`ipconfig /flushdns` or `systemd-resolve --flush-caches`)",
+      "Check and clean the local hosts file (`C:\\Windows\\System32\\drivers\\etc\\hosts` or `/etc/hosts`) for malicious entries",
+      "If using an internal DNS server, verify its integrity, check its logs for unusual activity, and update its software",
+      "Implement DNSSEC validation on your recursive DNS servers to prevent spoofing",
+      "Scan affected workstations for malware that might be altering DNS settings or hosts file",
+      "Consider changing your DNS server to a trusted third-party provider if you suspect your ISP's DNS is compromised"
+    ]
+  },
+  {
+    "id": "R051",
+    "category": "DNS",
+    "symptom": "Users in a specific subnet cannot resolve hostnames, while others can",
+    "conditions": [
+      "Clients in one subnet fail DNS lookups, but clients in other subnets succeed",
+      "DNS configuration for the affected subnet (e.g., DHCP scope DNS servers) is identical to working subnets",
+      "Ping to the DNS server from the affected subnet fails"
+    ],
+    "diagnosis": "Network connectivity issue between the subnet and DNS server, or firewall blocking",
+    "solution": [
+      "Verify network connectivity (routing, VLANs) between the affected subnet and the DNS server",
+      "Check firewall rules between the affected subnet and the DNS server to ensure UDP/TCP port 53 is allowed",
+      "Ensure the default gateway for the affected subnet is configured correctly and reachable",
+      "Examine switch port configuration (VLANs, ACLs) for the affected subnet",
+      "Perform a `traceroute` from an affected client to the DNS server to identify the point of failure",
+      "Temporarily assign a static IP and known good DNS server to a client in the affected subnet for testing"
+    ]
+  },
+  {
+    "id": "R052",
+    "category": "DNS",
+    "symptom": "DNS dynamic updates failing in an Active Directory environment",
+    "conditions": [
+      "Newly joined domain computers do not register their A and PTR records in DNS",
+      "DnsCmd or PowerShell commands to force registration fail with permission errors",
+      "Event Viewer on domain controllers shows errors related to DNS dynamic updates (e.g., Event ID 4515)"
+    ],
+    "diagnosis": "Permissions issues, DNS server health, or Netlogon service problems",
+    "solution": [
+      "Verify that the computer accounts have permissions to update their own DNS records in the DNS zone",
+      "Check the health of the DNS server roles on domain controllers and ensure they are authoritative for the zone",
+      "Restart the Netlogon service on the affected domain controller or client to force registration",
+      "Ensure that Secure Dynamic Updates is configured correctly for the zone",
+      "Review DNS debug logs on the domain controller for more specific errors during dynamic update attempts",
+      "Run `dcdiag /test:dns` on domain controllers to identify DNS-related issues"
+    ]
+  },
+  {
+    "id": "R053",
+    "category": "DNS",
+    "symptom": "Outbound SMTP mail flow is delayed due to slow DNS resolution of MX records",
+    "conditions": [
+      "Email queue on the SMTP server grows, and messages are delayed due to DNS lookup failures for recipient domains",
+      "Mail server logs show 'DNS lookup failed' or 'Host not found' for external mail servers",
+      "Overall internet connectivity is fine, but external DNS lookups for MX records are slow"
+    ],
+    "diagnosis": "Mail server's DNS configuration, DNS forwarder issues, or slow public DNS servers",
+    "solution": [
+      "Ensure the mail server is configured to use reliable and fast internal or external DNS servers",
+      "Check the performance and reachability of the configured DNS forwarders on your internal DNS server",
+      "Consider configuring the mail server to use public DNS servers (e.g., 8.8.8.8, 1.1.1.1) directly for external lookups if allowed by policy",
+      "Review firewall rules to ensure outbound UDP/TCP 53 traffic from the mail server is not being blocked or inspected excessively",
+      "Clear the DNS cache on the mail server if it has one",
+      "Perform `dig <recipient_domain> MX` from the mail server to identify resolution speed and results"
+    ]
+  },
+  {
+    "id": "R054",
+    "category": "DNS",
+    "symptom": "DNS resolver error on a Linux server after network configuration change",
+    "conditions": [
+      "`/etc/resolv.conf` file is empty or contains incorrect DNS server entries",
+      "`systemctl status systemd-resolved` shows errors or 'failed' status",
+      "Server cannot resolve any hostnames, internal or external"
+    ],
+    "diagnosis": "Corrupted `resolv.conf`, `systemd-resolved` service issue, or incorrect network configuration script",
+    "solution": [
+      "Manually edit `/etc/resolv.conf` to include valid DNS server IPs (e.g., `nameserver 8.8.8.8`)",
+      "Restart the `systemd-resolved` service (`sudo systemctl restart systemd-resolved`) or NetworkManager (`sudo systemctl restart NetworkManager`)",
+      "Verify that the network interface configuration files (e.g., `/etc/network/interfaces` or `nmcli connection show`) specify correct DNS servers",
+      "Check for conflicts with other DNS resolution services (e.g., `dnsmasq`, `bind`) if they are running",
+      "Ensure the file permissions for `/etc/resolv.conf` are correct",
+      "Check `journalctl -xe` or `dmesg` for errors related to `systemd-resolved` or network configuration"
+    ]
+  },
+  {
+    "id": "R055",
+    "category": "DNS",
+    "symptom": "Some internal applications use hardcoded IP addresses instead of hostnames",
+    "conditions": [
+      "Application configuration files explicitly define IP addresses for backend services",
+      "Changes to server IPs require manual updates to application configurations",
+      "IP address conflicts occur due to static IP assignment for application components"
+    ],
+    "diagnosis": "Poor application design, lack of DNS integration for internal services, or management overhead",
+    "solution": [
+      "Encourage application developers to use hostnames and DNS for service discovery instead of hardcoded IPs",
+      "Create DNS A records for all application-related services to provide a single point of change",
+      "Implement a DNS naming convention for internal services to simplify management",
+      "Use load balancers or service meshes that can handle IP changes transparently via DNS",
+      "Document all hardcoded IP instances and plan for migration to DNS-based resolution",
+      "Consider using configuration management tools (e.g., Ansible, Puppet) to manage application configurations centrally"
+    ]
+  },
+  {
+    "id": "R056",
+    "category": "DNS",
+    "symptom": "DNSSEC validation failures for some public domains",
+    "conditions": [
+      "DNS resolver logs show 'DNSSEC validation failure' or 'SERVFAIL' for specific DNSSEC-signed domains",
+      "Websites using these domains are unreachable or show certificate errors",
+      "Internal DNS server cannot validate the DNSSEC chain of trust for the domain"
+    ],
+    "diagnosis": "Incorrect DNSSEC configuration on resolver, outdated trust anchors, or time synchronization issues",
+    "solution": [
+      "Verify that your DNS resolver is correctly configured for DNSSEC validation and has the latest trust anchors (root KSK)",
+      "Ensure your DNS server's system clock is accurately synchronized via NTP, as time skews can break DNSSEC validation",
+      "Check the DNSSEC configuration of the problematic domain using tools like DNSViz.net or DNSSEC Analyzer",
+      "Temporarily disable DNSSEC validation on your resolver to confirm it's the cause (and re-enable after troubleshooting)",
+      "Update the DNS server software to the latest version to ensure bug fixes and improved DNSSEC support",
+      "Contact the domain owner if their DNSSEC signing appears to be misconfigured"
+    ]
+  },
+  {
+    "id": "R057",
+    "category": "DNS",
+    "symptom": "DHCP clients not updating their DNS records dynamically",
+    "conditions": [
+      "DHCP clients receive IP addresses, but their A and PTR records are not registered in DNS",
+      "DHCP server logs show 'DNS update failed' errors",
+      "DNS server event logs show permission errors for dynamic updates from the DHCP server"
+    ],
+    "diagnosis": "DHCP server permissions for DNS updates, DNS zone configuration for dynamic updates, or Netlogon issues",
+    "solution": [
+      "Ensure the DHCP server's computer account has sufficient permissions (e.g., part of 'DnsUpdateProxy' group) to update DNS records",
+      "Verify that the DNS zone is configured to allow secure dynamic updates (or non-secure if appropriate for the environment)",
+      "Check the DHCP server configuration for DNS update settings (e.g., 'Always dynamically update DNS A and PTR records')",
+      "Restart the DHCP server service to refresh its DNS update capabilities",
+      "Review the DHCP server's event logs for specific errors related to DNS updates",
+      "Ensure the Netlogon service is running on domain controllers and handling dynamic updates"
+    ]
+  },
+  {
+    "id": "R058",
+    "category": "DNS",
+    "symptom": "DNS resolution fails for specific TLDs (Top-Level Domains)",
+    "conditions": [
+      "`nslookup` for domains like `.org`, `.net`, or `.io` fails, but `.com` domains work",
+      "Root hint servers configured on the DNS server are unreachable or outdated",
+      "Firewall rules are specifically blocking traffic to certain IP ranges that host TLD servers"
+    ],
+    "diagnosis": "Outdated root hints, firewall blocking, or DNS server forwarder issues",
+    "solution": [
+      "Ensure the DNS server's root hints are up-to-date and reachable",
+      "Check that forwarders configured on the DNS server are working correctly and can resolve all TLDs",
+      "Verify that no firewall rules are inadvertently blocking outbound DNS queries to specific IP ranges or TLD DNS servers",
+      "If using a proxy for DNS queries, check its configuration and logs for issues",
+      "Consider temporarily disabling any DNS filtering or content filtering services that might be causing this issue",
+      "Perform a packet capture on the DNS server to observe if queries for the problematic TLDs are leaving the network"
+    ]
+  },
+  {
+    "id": "R059",
+    "category": "DNS",
+    "symptom": "DNS server resource exhaustion (CPU/memory alerts)",
+    "conditions": [
+      "Monitoring system reports high CPU or memory usage on the DNS server",
+      "DNS queries are experiencing timeouts or being dropped due to server overload",
+      "Number of open connections or processes related to DNS daemon is unusually high"
+    ],
+    "diagnosis": "High query load, misconfigured caching, or potential DoS attack",
+    "solution": [
+      "Identify the source of the high query load using DNS server logs or traffic analysis tools (e.g., `dig @localhost +noall +stats` for server stats)",
+      "Optimize DNS caching settings to maximize hits and minimize recursion",
+      "Implement DNS query logging to identify any unusual or excessive query patterns",
+      "Consider splitting DNS services across multiple servers or implementing DNS load balancing",
+      "Increase the hardware resources (CPU, RAM) of the DNS server",
+      "If it's a DoS attack, implement DNS firewalling, rate limiting, or use a cloud-based DNS protection service"
+    ]
+  },
+  {
+    "id": "R060",
+    "category": "DNS",
+    "symptom": "Client DNS settings keep reverting to incorrect values",
+    "conditions": [
+      "Manually configured DNS server IPs on client revert after reboot or network restart",
+      "DHCP server is configured to provide incorrect DNS server IPs",
+      "Group Policy Objects (GPOs) or configuration management tools are overriding local settings"
+    ],
+    "diagnosis": "DHCP server misconfiguration, GPO enforcement, or local configuration override",
+    "solution": [
+      "Check the DHCP server's scope options to ensure it's distributing the correct DNS server IPs",
+      "Verify that no Group Policy Objects (GPOs) are configured to enforce specific DNS settings on the client (run `gpresult /r` on Windows)",
+      "Examine configuration management tools (e.g., Puppet, Ansible, SCCM) for any DNS configuration overrides",
+      "If on a Linux system, ensure `NetworkManager` or `systemd-resolved` are configured not to overwrite `/etc/resolv.conf` or are correctly configured",
+      "Check for any malicious software on the client that might be altering network settings",
+      "Reset the client's network adapter and reconfigure DNS settings to observe if the issue persists"
+    ]
+  }
+]

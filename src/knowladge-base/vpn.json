@@ -1,0 +1,442 @@
+[
+  {
+    "id": "R101",
+    "category": "VPN",
+    "symptom": "VPN client fails to establish a connection",
+    "conditions": [
+      "Connection attempt times out or fails with a generic error message (e.g., 'Could not connect to VPN server')",
+      "Firewall on client or network reports blocked VPN ports (e.g., UDP 500, 4500 for IPsec; TCP/UDP 1194 for OpenVPN)",
+      "VPN server is unreachable via ping or traceroute from the client's network",
+      "VPN client logs show 'authentication failed' or 'certificate validation failed'",
+      "No network activity observed on VPN client's network interface during connection attempt"
+    ],
+    "diagnosis": "VPN server unreachable, firewall blockage, or incorrect client configuration/credentials.",
+    "solution": [
+      "Verify the VPN server's IP address/hostname is correct and reachable from the client's network.",
+      "Check local firewall settings on the client and network firewall (router/corporate firewall) to ensure VPN ports are open.",
+      "Confirm VPN username and password or certificate details are correct and not expired.",
+      "Try connecting to the VPN server from a different network or device to isolate the issue.",
+      "Review VPN server logs for connection attempts and specific error messages.",
+      "Restart the VPN client application and the client's network adapter.",
+      "Update VPN client software to the latest version."
+    ]
+  },
+  {
+    "id": "R102",
+    "category": "VPN",
+    "symptom": "VPN connects successfully but no internet access",
+    "conditions": [
+      "Ping to public IP addresses (e.g., 8.8.8.8) fails when VPN is connected but works when disconnected.",
+      "DNS resolution fails (e.g., cannot access google.com by name) but works by IP address (if known).",
+      "Default gateway on the client changes to the VPN tunnel interface, but traffic is not routing correctly.",
+      "VPN client logs show 'route added' messages but no data flow.",
+      "Packet capture on the client shows outbound traffic but no return traffic over the VPN tunnel."
+    ],
+    "diagnosis": "Incorrect routing configuration on VPN server, DNS issues within VPN tunnel, or firewall blocking NAT/internet access from VPN subnet.",
+    "solution": [
+      "Verify that the VPN server is configured to allow internet access (e.g., NAT enabled for VPN subnet).",
+      "Check DNS settings configured for the VPN client – ensure they point to reachable DNS servers (internal or external).",
+      "Review the VPN server's routing table to ensure routes to the internet are correctly propagated to VPN clients.",
+      "Disable split tunneling on the client (if enabled) to force all traffic through the VPN tunnel, then re-evaluate.",
+      "Check firewall rules on the VPN server and perimeter firewall to ensure outbound internet access from the VPN subnet is permitted.",
+      "Renew the IP address on the VPN client to ensure it receives new routing/DNS information.",
+      "Verify the VPN server's internal network interface has internet access itself."
+    ]
+  },
+  {
+    "id": "R103",
+    "category": "VPN",
+    "symptom": "VPN connects but cannot access internal network resources",
+    "conditions": [
+      "Ping to internal IP addresses (e.g., file server) fails when VPN is connected.",
+      "Shares or applications requiring internal network access are unreachable.",
+      "VPN client logs show 'route added' for the internal network subnet, but no communication.",
+      "Firewall on internal network devices or VPN server blocks traffic from VPN subnet.",
+      "Internal DNS resolution for internal hostnames fails over VPN."
+    ],
+    "diagnosis": "Incorrect routing on VPN server or internal network, firewall blocking, or DNS resolution issues for internal resources.",
+    "solution": [
+      "Verify that the VPN server has routes defined to the internal network subnets that clients need to access.",
+      "Check firewall rules on the VPN server and internal network devices (e.g., Windows Firewall on servers) to ensure traffic from the VPN client subnet is permitted.",
+      "Ensure DNS settings provided to the VPN client (or configured manually) point to internal DNS servers for internal hostname resolution.",
+      "Confirm that the internal network infrastructure (routers, switches) has routes back to the VPN server's internal interface or the VPN client subnet.",
+      "Check for IP address conflicts between the VPN client's assigned IP and an existing internal network device.",
+      "Temporarily disable client-side firewall to rule out local interference, then re-enable with proper exceptions.",
+      "Verify that the internal network resources are actually up and accessible from other internal devices."
+    ]
+  },
+  {
+    "id": "R104",
+    "category": "VPN",
+    "symptom": "VPN connection drops frequently",
+    "conditions": [
+      "VPN client logs show repeated disconnections and reconnection attempts.",
+      "Network connectivity to the internet from the client's location is unstable (e.g., frequent Wi-Fi drops, high packet loss).",
+      "VPN server logs indicate client disconnections without explicit logout from the client side.",
+      "High latency or packet loss observed during the VPN connection via ping to the VPN server.",
+      "Client receives 'session timeout' or 'idle timeout' messages from VPN server."
+    ],
+    "diagnosis": "Unstable internet connection, VPN server overload, incorrect timeout settings, or MTU issues.",
+    "solution": [
+      "Check the stability of the client's underlying internet connection (e.g., test Wi-Fi signal strength, direct Ethernet connection).",
+      "Increase the Keepalive/Timeout settings on both the VPN client and server (if permissible and secure).",
+      "Investigate VPN server resource utilization (CPU, memory, bandwidth) for signs of overload.",
+      "Adjust MTU (Maximum Transmission Unit) settings on the VPN client or server if packet fragmentation is suspected.",
+      "Try connecting from a different physical location or network to isolate network-specific issues.",
+      "Update VPN client and server software/firmware to the latest stable versions.",
+      "Review network device logs (routers, firewalls) between client and server for connection resets or errors."
+    ]
+  },
+  {
+    "id": "R105",
+    "category": "VPN",
+    "symptom": "Slow performance when connected to VPN",
+    "conditions": [
+      "File transfers are significantly slower over VPN compared to direct access.",
+      "Applications are unresponsive or laggy when connected to VPN.",
+      "Ping to internal resources over VPN shows high latency or packet loss.",
+      "Bandwidth tests (e.g., speedtest.net) show significantly reduced speeds when VPN is active.",
+      "VPN client or server reports high CPU/memory utilization during data transfer."
+    ],
+    "diagnosis": "Network congestion, insufficient bandwidth, VPN server overload, high latency/packet loss on underlying connection, or inefficient encryption/tunneling protocol.",
+    "solution": [
+      "Check the client's local internet bandwidth and verify it meets the demands of VPN usage.",
+      "Monitor VPN server performance (CPU, memory, network I/O) to identify bottlenecks.",
+      "Optimize VPN client and server encryption settings (e.g., use a less CPU-intensive cipher if security permits).",
+      "Reduce the amount of data transferred over VPN where possible (e.g., by optimizing application usage).",
+      "Upgrade internet connection bandwidth at either the client or VPN server location.",
+      "Implement QoS (Quality of Service) policies on network devices to prioritize VPN traffic.",
+      "Consider using a different VPN protocol (e.g., WireGuard, IKEv2 instead of OpenVPN or L2TP) if supported."
+    ]
+  },
+  {
+    "id": "R106",
+    "category": "VPN",
+    "symptom": "DNS resolution fails over VPN",
+    "conditions": [
+      "Cannot access websites by hostname (e.g., google.com) but can by IP address (e.g., 142.250.190.142).",
+      "Internal network hostnames are not resolving (e.g., fileserver.domain.local).",
+      "DNS server configured on VPN client is unreachable or incorrect (e.g., `nslookup` returns timeout or NXDOMAIN).",
+      "VPN client reports DNS server assignment errors in logs.",
+      "Packet capture shows DNS queries being sent but no responses received over the VPN tunnel."
+    ],
+    "diagnosis": "Incorrect DNS server configuration on VPN server, internal DNS server firewall issues, or split-DNS configuration problems.",
+    "solution": [
+      "Verify that the VPN server pushes the correct DNS server addresses to VPN clients.",
+      "Ensure that the DNS servers specified for VPN clients are reachable from the VPN server and allow queries from the VPN client subnet.",
+      "Check firewall rules on internal DNS servers to ensure they accept queries from the VPN subnet.",
+      "If using split DNS, ensure the VPN client correctly identifies which domains to resolve via the VPN tunnel and which locally.",
+      "Manually configure DNS servers on the VPN client's tunnel adapter to test direct connectivity.",
+      "Flush the DNS cache on the client machine (`ipconfig /flushdns` on Windows, `sudo dscacheutil -flushcache` on macOS).",
+      "Review VPN server logs for any DNS forwarding or relay errors."
+    ]
+  },
+  {
+    "id": "R107",
+    "category": "VPN",
+    "symptom": "Authentication failed for VPN client",
+    "conditions": [
+      "VPN client immediately disconnects after attempting to authenticate.",
+      "Error message states 'Authentication failed', 'Invalid username or password', or 'Bad credentials'.",
+      "VPN server logs show 'authentication failure' or 'rejected' messages for the client's connection attempt.",
+      "User account is locked out on the authentication server (e.g., Active Directory, RADIUS).",
+      "Client certificate is expired or revoked."
+    ],
+    "diagnosis": "Incorrect credentials, expired certificate, locked user account, or authentication server connectivity issues.",
+    "solution": [
+      "Verify the username and password entered by the client are correct and case-sensitive.",
+      "Check if the user account is locked out or disabled on the authentication server (e.g., Active Directory, RADIUS, LDAP).",
+      "Ensure the client's certificate is valid, not expired, and trusted by the VPN server.",
+      "Verify connectivity from the VPN server to the authentication server (e.g., ping, `telnet` to port 389 for LDAP, 1812 for RADIUS).",
+      "Review VPN server configuration for correct authentication method and server settings.",
+      "Reset the user's password on the authentication system.",
+      "Test authentication with a known working account if available."
+    ]
+  },
+  {
+    "id": "R108",
+    "category": "VPN",
+    "symptom": "VPN client stuck on 'connecting'",
+    "conditions": [
+      "VPN client shows 'Connecting...' or 'Authenticating...' indefinitely.",
+      "No IP address is assigned to the VPN tunnel interface.",
+      "VPN server logs show no incoming connection attempts from the client's IP, or attempts are stuck in initial negotiation phases.",
+      "Firewall on client or network device is silently dropping VPN connection packets.",
+      "No traffic visible on the VPN client's tunnel adapter using a packet capture tool."
+    ],
+    "diagnosis": "Firewall blocking, NAT traversal issues, incorrect pre-shared key/certificate, or network instability during negotiation.",
+    "solution": [
+      "Check local firewall on the client to ensure VPN application has full outbound access and inbound replies are allowed.",
+      "Verify the VPN client is using the correct server address and pre-shared key (if applicable).",
+      "Ensure NAT Traversal (NAT-T) is enabled on both client and server if the client is behind a NAT device.",
+      "Review the client's internet connectivity for stability and packet loss.",
+      "Try connecting to the VPN from a different network to rule out local network issues.",
+      "Check VPN server logs for any partial connection attempts or negotiation errors.",
+      "Restart the VPN client and client's network adapter."
+    ]
+  },
+  {
+    "id": "R109",
+    "category": "VPN",
+    "symptom": "Split tunneling not working as expected",
+    "conditions": [
+      "All traffic is routed through the VPN tunnel despite split tunneling being enabled.",
+      "Local internet access is lost when VPN is connected.",
+      "Specific applications or destinations intended to use local network/internet are routed over VPN.",
+      "Routing table on client (`route print` on Windows, `netstat -rn` on Linux/macOS) shows only a default route via VPN.",
+      "Packet capture shows traffic intended for local network/internet going over VPN."
+    ],
+    "diagnosis": "Incorrect routing configuration on VPN server, client-side routing issues, or overlapping subnets.",
+    "solution": [
+      "Verify that the VPN server is configured to push specific routes only for the internal network and not a default route.",
+      "Ensure the VPN client software properly supports and applies split tunneling configurations.",
+      "Check for overlapping IP subnets between the client's local network and the VPN internal network, which can cause routing conflicts.",
+      "Manually inspect the client's routing table after VPN connection to confirm routes are applied correctly.",
+      "Review VPN client configuration for options related to split tunneling behavior (e.g., 'Use remote gateway on remote network').",
+      "Restart the VPN client service and the client's network adapter.",
+      "Update VPN client software to the latest version, as split tunneling bugs can exist."
+    ]
+  },
+  {
+    "id": "R110",
+    "category": "VPN",
+    "symptom": "VPN server unreachable",
+    "conditions": [
+      "Ping to the VPN server's public IP address fails.",
+      "Traceroute to the VPN server times out or stops at an intermediate hop.",
+      "VPN server's public IP address is not responding to port scans for VPN specific ports.",
+      "Other services hosted on the same server are also unreachable (e.g., web server, SSH).",
+      "Network device logs (router/firewall) at the server's location show connection attempts being dropped or not forwarded."
+    ],
+    "diagnosis": "VPN server is down, network connectivity issue to the server, firewall blocking at server side, or DNS resolution issue for server hostname.",
+    "solution": [
+      "Verify the VPN server machine is powered on and its operating system is running.",
+      "Check the internet connectivity of the network where the VPN server is located.",
+      "Ensure firewall rules on the server and at its perimeter allow inbound VPN traffic.",
+      "Verify that the public IP address or hostname configured on the VPN client is correct and resolves to the server's current public IP.",
+      "Check the server's network interface status and configuration.",
+      "Restart the VPN service on the server if it's running but unresponsive.",
+      "Review server-side router/firewall logs for port forwarding or NAT issues."
+    ]
+  },
+  {
+    "id": "R111",
+    "category": "VPN",
+    "symptom": "IP address conflict on VPN client",
+    "conditions": [
+      "VPN client connects but reports an IP address conflict error message.",
+      "Connectivity to the VPN network is intermittent or non-existent after connecting.",
+      "Network logs on the VPN server or an internal device report duplicate IP addresses.",
+      "Other devices on the local network or VPN network experience connectivity issues when the VPN client connects.",
+      "Client's IP address is identical to another device's IP address on the VPN network or local network."
+    ],
+    "diagnosis": "DHCP scope misconfiguration on VPN server, static IP assignment conflict, or overlapping subnets.",
+    "solution": [
+      "Review the VPN server's DHCP scope for VPN clients to ensure it's unique and sufficient.",
+      "If using static IP assignment, verify that the assigned IP address is not already in use on the VPN network.",
+      "Check the client's local network subnet to ensure it doesn't overlap with the VPN network subnet.",
+      "Renew the IP address on the VPN client (e.g., `ipconfig /release`, `ipconfig /renew` on Windows).",
+      "If possible, configure a different IP address pool for VPN clients on the server.",
+      "Scan the network for duplicate IP addresses using tools like `arping` or network scanners.",
+      "Restart the client machine and the VPN service."
+    ]
+  },
+  {
+    "id": "R112",
+    "category": "VPN",
+    "symptom": "VPN client software crashing",
+    "conditions": [
+      "VPN client application closes unexpectedly upon launch or connection attempt.",
+      "Error messages related to application crash (e.g., 'Application has stopped working') appear.",
+      "System event logs (Windows Event Viewer, macOS Console) show crash reports for the VPN client executable.",
+      "Other applications on the client machine are stable.",
+      "The crash occurs consistently across multiple connection attempts or user profiles."
+    ],
+    "diagnosis": "Software corruption, incompatibility with OS, conflicting applications, or missing dependencies.",
+    "solution": [
+      "Update the VPN client software to the latest version provided by the vendor.",
+      "Reinstall the VPN client software, ensuring a clean uninstall first.",
+      "Check the operating system compatibility matrix for the VPN client version being used.",
+      "Temporarily disable other security software (antivirus, anti-malware) to check for conflicts, then re-enable.",
+      "Update the client's operating system to the latest service pack and security patches.",
+      "Check for missing software dependencies (e.g., .NET Framework, Visual C++ Redistributables).",
+      "Try running the VPN client in compatibility mode or as an administrator."
+    ]
+  },
+  {
+    "id": "R113",
+    "category": "VPN",
+    "symptom": "Specific application not working over VPN",
+    "conditions": [
+      "Application fails to connect to its server or retrieve data when VPN is active.",
+      "Other network-dependent applications (e.g., web browser) work correctly over VPN.",
+      "Firewall on client or server blocks specific application ports/protocols over VPN.",
+      "Application's server is unreachable via ping or `telnet` to its specific port over VPN.",
+      "Application logs report network errors or connection timeouts."
+    ],
+    "diagnosis": "Firewall blocking, application-specific proxy settings, or incorrect routing for the application's destination.",
+    "solution": [
+      "Verify firewall rules on both the client and the internal network (where the application's server resides) permit the application's traffic over the VPN tunnel.",
+      "Check if the application has proxy settings enabled and configured correctly for VPN usage (e.g., bypassing proxy for internal resources).",
+      "Ensure that the VPN server pushes routes for the specific subnet where the application's server is located.",
+      "Use packet capture tools (e.g., Wireshark) to analyze traffic flow for the application and identify where it's being dropped.",
+      "Consult the application's documentation for any specific network requirements or VPN compatibility notes.",
+      "Try disabling any VPN client features like 'Smart Tunneling' or 'Always On VPN' that might interfere with specific application traffic.",
+      "Test the application from another device on the internal network to confirm the application server itself is functioning."
+    ]
+  },
+  {
+    "id": "R114",
+    "category": "VPN",
+    "symptom": "High latency over VPN connection",
+    "conditions": [
+      "Ping to the VPN server or internal resources shows consistently high round-trip times (RTT).",
+      "Applications requiring real-time interaction (e.g., VoIP, video conferencing) perform poorly.",
+      "Network bandwidth is adequate, but response times are slow.",
+      "Traceroute shows increased latency at multiple hops, especially at the VPN server or immediately after.",
+      "Packet loss is minimal, but latency is high."
+    ],
+    "diagnosis": "Geographic distance, network congestion, overloaded VPN server, or inefficient encryption/tunneling protocol.",
+    "solution": [
+      "Evaluate the physical distance between the client and the VPN server, as higher distance naturally increases latency.",
+      "Check for network congestion on the internet path between the client and VPN server (e.g., during peak hours).",
+      "Monitor the VPN server's CPU and memory usage to ensure it's not overloaded.",
+      "Consider using a VPN protocol optimized for lower latency, such as WireGuard or IKEv2, if supported.",
+      "Ensure QoS (Quality of Service) settings on intermediate network devices are not causing latency for VPN traffic.",
+      "Optimize VPN encryption strength if it's excessively high for the available CPU resources.",
+      "Try connecting from a location with a faster or less congested internet connection."
+    ]
+  },
+  {
+    "id": "R115",
+    "category": "VPN",
+    "symptom": "Cannot ping resources on VPN network",
+    "conditions": [
+      "Ping to internal network IP addresses fails, even though VPN is connected and routing seems fine.",
+      "Connectivity to specific services (e.g., web servers, file shares) on the VPN network works, but ping fails.",
+      "Firewall on the target resource or an intermediate network device blocks ICMP traffic.",
+      "VPN server routing configuration does not include the specific subnet of the pinged resource.",
+      "Windows Firewall or Linux `iptables` on the target resource block incoming ICMP Echo requests."
+    ],
+    "diagnosis": "Firewall blocking ICMP, incorrect routing, or resource is offline.",
+    "solution": [
+      "Check the firewall settings on the target resource to ensure ICMP Echo requests are permitted.",
+      "Verify that the VPN server has correct routes to the subnet where the target resource resides.",
+      "Ensure that any intermediate firewalls or routers between the VPN server and the target resource allow ICMP traffic.",
+      "Confirm the target resource is online and accessible from other devices on the internal network.",
+      "Try `telnet` to a known open port on the target resource (e.g., port 80 for a web server) to confirm basic connectivity.",
+      "Review VPN client configuration to ensure it's not configured to block ICMP.",
+      "Check `arp -a` on the VPN client to see if the MAC address of the VPN gateway or target resource is resolved."
+    ]
+  },
+  {
+    "id": "R116",
+    "category": "VPN",
+    "symptom": "VPN tunnel established, but no data throughput",
+    "conditions": [
+      "VPN client indicates 'Connected' status, but no data is being sent or received (0 bytes transferred).",
+      "Ping to any destination (internet or internal) times out.",
+      "Packet capture on the VPN tunnel interface shows no outbound or inbound data packets after initial handshake.",
+      "VPN client logs report errors after the 'connected' status, or no data transfer messages.",
+      "Throughput monitoring on the VPN server shows zero bandwidth usage for the client."
+    ],
+    "diagnosis": "MTU mismatch, routing issues after tunnel establishment, or firewall blocking on the VPN server.",
+    "solution": [
+      "Investigate and adjust MTU (Maximum Transmission Unit) settings on the VPN client and server to prevent packet fragmentation.",
+      "Verify that the VPN server's internal network interface has appropriate routing configured for internet access and internal networks.",
+      "Check firewall rules on the VPN server that might be blocking forwarding of traffic from the VPN tunnel to internal or external networks.",
+      "Restart the VPN service on the server and the VPN client application.",
+      "Review VPN server configuration for any post-connection scripts or rules that might be misconfigured.",
+      "Test with a different VPN protocol if available and supported by the VPN server.",
+      "Examine client-side network adapters for any software conflicts or misconfigurations."
+    ]
+  },
+  {
+    "id": "R117",
+    "category": "VPN",
+    "symptom": "Peer certificate validation failed",
+    "conditions": [
+      "VPN client logs report 'Certificate validation failed', 'Untrusted certificate', or 'Certificate expired/revoked'.",
+      "Connection attempt fails immediately after certificate exchange.",
+      "The server's certificate is not signed by a trusted Root CA on the client machine.",
+      "System date and time on the client or server are incorrect.",
+      "Certificate revocation lists (CRLs) or Online Certificate Status Protocol (OCSP) checks fail."
+    ],
+    "diagnosis": "Expired/revoked certificate, untrusted CA, incorrect system time, or CRL/OCSP access issues.",
+    "solution": [
+      "Verify the server's certificate is valid, not expired, and issued by a Certificate Authority (CA) trusted by the client.",
+      "Ensure the client's system date and time are accurate and synchronized with an NTP server.",
+      "Import the root certificate of the CA that signed the VPN server's certificate into the client's trusted root certificate store.",
+      "Check network connectivity from the VPN client to the CRL distribution points or OCSP responder URLs.",
+      "If using a self-signed certificate, ensure it's properly imported and trusted on the client.",
+      "Reissue or update the server certificate if it's expired or revoked.",
+      "Review the certificate chain of trust on the VPN server for any broken links."
+    ]
+  },
+  {
+    "id": "R118",
+    "category": "VPN",
+    "symptom": "VPN server overload",
+    "conditions": [
+      "Multiple VPN clients report slow performance or connection failures simultaneously.",
+      "VPN server's CPU, memory, or network interface utilization is consistently high.",
+      "Login attempts are delayed or time out.",
+      "Server logs show messages related to resource exhaustion (e.g., 'Out of memory', 'Max connections reached').",
+      "Overall network throughput through the VPN server is low despite available underlying bandwidth."
+    ],
+    "diagnosis": "Excessive concurrent connections, insufficient server resources, or unoptimized VPN configuration.",
+    "solution": [
+      "Increase VPN server resources (CPU, RAM) or upgrade to more powerful hardware.",
+      "Distribute VPN load across multiple VPN servers if possible (e.g., using a load balancer).",
+      "Optimize VPN protocol and encryption settings for better performance (e.g., use hardware acceleration if available).",
+      "Implement connection limits per user or per IP address on the VPN server.",
+      "Review and optimize VPN server configuration for efficiency (e.g., reduce logging verbosity).",
+      "Ensure underlying network infrastructure (switches, routers) connected to the VPN server can handle the load.",
+      "Consider implementing a dedicated VPN appliance instead of a software-based VPN server."
+    ]
+  },
+  {
+    "id": "R119",
+    "category": "VPN",
+    "symptom": "Routing issues when VPN is active",
+    "conditions": [
+      "Cannot access specific internal subnets or external destinations when VPN is connected.",
+      "Default route changes incorrectly or multiple default routes exist.",
+      "Traceroute shows traffic taking an unexpected path or failing at internal routers.",
+      "VPN client's routing table shows missing or incorrect routes for desired destinations.",
+      "Applications attempt to connect to internal resources via the internet instead of the VPN tunnel."
+    ],
+    "diagnosis": "Incorrect route propagation from VPN server, local routing conflicts, or overlapping subnets.",
+    "solution": [
+      "Verify that the VPN server is pushing the correct static routes or dynamic routing updates for all necessary internal subnets to the clients.",
+      "Check the VPN client's local routing table (`route print` on Windows, `ip route show` on Linux) for unexpected routes or conflicts.",
+      "Ensure there are no overlapping IP subnets between the client's local network, the VPN client IP pool, and the VPN's internal networks.",
+      "If using split tunneling, confirm that only the necessary routes are sent over the VPN.",
+      "Disable DHCP client on the VPN tunnel interface if static routes are preferred and verify manually configured routes.",
+      "Review any routing protocols (e.g., OSPF, BGP) running on the VPN server or internal network for misconfigurations.",
+      "Restart the VPN client application and the client's network adapter to refresh routing entries."
+    ]
+  },
+  {
+    "id": "R120",
+    "category": "VPN",
+    "symptom": "VPN client reports incorrect IP address",
+    "conditions": [
+      "VPN client shows an IP address different from the expected VPN subnet or an IP address that is already in use.",
+      "Connectivity issues arise immediately after an IP address is assigned.",
+      "VPN server logs show an IP address assigned to the client that does not match what the client reports.",
+      "The client's IP address is in a pool not intended for VPN clients.",
+      "ARP cache on the client or other devices shows an incorrect MAC address for the reported IP."
+    ],
+    "diagnosis": "DHCP server misconfiguration on VPN, static IP conflict, or network adapter reporting incorrect information.",
+    "solution": [
+      "Verify the DHCP scope configured on the VPN server for VPN clients to ensure it's correct and available.",
+      "If using static IP assignment, double-check the client's configuration and ensure the IP is unique.",
+      "Check for any other DHCP servers active on the network that might be assigning conflicting IP addresses.",
+      "Flush the IP configuration on the client (`ipconfig /release`, `ipconfig /renew` on Windows) and restart the VPN client.",
+      "Review the VPN client software's settings for any manual IP configurations that might override DHCP.",
+      "Inspect VPN server logs for detailed IP address assignment information.",
+      "Consider performing a packet capture during the IP assignment process to see which DHCP server is responding."
+    ]
+  }
+]
