@@ -1,7 +1,9 @@
-import express from "express";
 import cors from "cors";
-import { OpenAI } from "openai";
+import path from "path";
 import dotenv from "dotenv";
+import express from "express";
+import { OpenAI } from "openai";
+import { fileURLToPath } from "url";
 
 const app = express();
 dotenv.config();
@@ -80,10 +82,18 @@ const askAi = async (prompt) => {
   return response.choices[0].message.content;
 };
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use(express.static(path.join(__dirname, "dist")));
+
 app.post("/api/chat", async (request, response) => {
   const { prompt } = request.body;
   const reply = await askAi(prompt);
   response.json({ reply });
+});
+
+app.get("*any", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
 const PORT = process.env.PORT || 3000;
