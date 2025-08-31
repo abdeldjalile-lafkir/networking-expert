@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
-import runInference from "../../inference-engine/InferenceEngine";
+//import runInference from "../../inference-engine/InferenceEngine";
 import { useRules } from "../../inference-engine/RulesContext";
 import Response from "./Response";
 
@@ -19,6 +19,7 @@ const PromptFiled = () => {
   });
 
   const [showTools, setShowTools] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const { rules } = useRules();
 
@@ -77,7 +78,19 @@ const PromptFiled = () => {
     }
   };
 
-  const AnalysisIssue = () => {
+  const assistant = async (request: any) => {
+    const response = await fetch("http://localhost:3000/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: request }),
+    });
+
+    const data = await response.json();
+    return JSON.parse(data.reply);
+  };
+
+  const AnalysisIssue = async () => {
+    setLoading(true);
     const request = {
       symptom: mainInputText,
       conditions: extraTexts,
@@ -90,7 +103,8 @@ const PromptFiled = () => {
       ),
     };
 
-    const response = runInference(request, rules);
+    const response = await assistant(request);
+    //const response = runInference(request, rules);
     setResponse(response);
     setMainInputText("");
     setExtraTexts([]);
@@ -112,6 +126,7 @@ const PromptFiled = () => {
       }
     }, 100);
 
+    setLoading(false);
     return;
   };
 
@@ -147,7 +162,7 @@ const PromptFiled = () => {
 
   return (
     <>
-      {response && response.id && <Response response={response} />}
+      {response && response.id !== "" && <Response response={response} />}
       <div className="flex items-center w-[99%] m-2 justify-between p-6 rounded-2xl ">
         {/* Main Content */}
         <div className="w-[50%] h-[9rem] relative mx-auto flex bg-gray-800 items-center justify-center rounded-2xl border border-blue-700  shadow-xl focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-70">
@@ -303,19 +318,51 @@ const PromptFiled = () => {
             onClick={AnalysisIssue}
             className=" absolute right-4 px-4 py-4 bg-blue-600 text-white rounded-xl shadow-lg hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105 text-lg font-semibold"
           >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="stroke-[2] relative"
-            >
-              <path
-                d="M5 11L12 4M12 4L19 11M12 4V21"
-                stroke="currentColor"
-              ></path>
-            </svg>
+            {loading ? (
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="stroke-[2] relative"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  fill="none"
+                  strokeDasharray="15 5"
+                  strokeLinecap="round"
+                >
+                  <animateTransform
+                    attributeName="transform"
+                    attributeType="XML"
+                    type="rotate"
+                    from="0 12 12"
+                    to="360 12 12"
+                    dur="1s"
+                    repeatCount="indefinite"
+                  />
+                </circle>
+              </svg>
+            ) : (
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="stroke-[2] relative"
+              >
+                <path
+                  d="M5 11L12 4M12 4L19 11M12 4V21"
+                  stroke="currentColor"
+                ></path>
+              </svg>
+            )}
           </button>
         </div>
       </div>

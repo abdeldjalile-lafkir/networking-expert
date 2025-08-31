@@ -39,7 +39,7 @@ const Response: React.FC<ResponseProps> = ({ response: responseProp }) => {
   const [typedId, setTypedId] = useState("");
   const [typedDiagnosis, setTypedDiagnosis] = useState("");
   const [typedSolutions, setTypedSolutions] = useState<string[]>(() =>
-    new Array(activeResponse.solution.length).fill("")
+    new Array(activeResponse.solution?.length).fill("")
   );
 
   const [currentTypingStage, setCurrentTypingStage] =
@@ -86,7 +86,7 @@ const Response: React.FC<ResponseProps> = ({ response: responseProp }) => {
           currentTargetText = activeResponse.diagnosis;
           if (charIndex >= currentTargetText.length) {
             nextStageAfterCompletion =
-              activeResponse.solution.length > 0 ? "solution-0" : "done";
+              activeResponse.solution?.length > 0 ? "solution-0" : "done";
           }
           break;
         default:
@@ -96,9 +96,9 @@ const Response: React.FC<ResponseProps> = ({ response: responseProp }) => {
               currentTypingStage.split("-")[1],
               10
             );
-            currentTargetText = activeResponse.solution[currentSolutionIndex];
+            currentTargetText = activeResponse?.solution[currentSolutionIndex];
             if (charIndex >= (currentTargetText?.length || 0)) {
-              if (currentSolutionIndex < activeResponse.solution.length - 1) {
+              if (currentSolutionIndex < activeResponse?.solution.length - 1) {
                 nextStageAfterCompletion = `solution-${
                   currentSolutionIndex + 1
                 }`;
@@ -162,7 +162,7 @@ const Response: React.FC<ResponseProps> = ({ response: responseProp }) => {
 
       <h3>@ you can try solve that by </h3>
       <ul className=" list-inside list-none">
-        {activeResponse.solution.map((_, index) => (
+        {activeResponse.solution?.map((_, index) => (
           <li key={index} className="text-gray-400 my-2">
             <span className=" px-4 text-[#4d80e4] font-bold">{"->"}</span>
             {typedSolutions[index] || ""}
