@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon index.js && vite",
     "build": "tsc -b && vite build && node index.js",
+    "start": "node index.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },
